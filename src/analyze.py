@@ -1,74 +1,103 @@
-"""Run the SQL analysis and export the results as JSON.
+"""Export dashboard metrics from the warehouse.
 
-Each query lives in its own .sql file so the SQL is easy to read and review —
-this module is only responsible for running them and shaping the output.
+The heavy lifting is done by the dbt models — this module only reads the marts
+and shapes them into the JSON the dashboard consumes. The SQL lives in dbt, so
+there is a single source of truth for every metric.
 """
 
 from __future__ import annotations
 
 import json
-import sqlite3
 from pathlib import Path
 
+import duckdb
+
 ROOT = Path(__file__).resolve().parent.parent
-DB_PATH = ROOT / "data" / "jobs.db"
-QUERY_DIR = ROOT / "queries"
+WAREHOUSE = ROOT / "data" / "warehouse.duckdb"
 OUT_DIR = ROOT / "web" / "data"
 
 
-def run_query(connection: sqlite3.Connection, sql: str, params: dict | None = None) -> list[dict]:
-    connection.row_factory = sqlite3.Row
-    cursor = connection.execute(sql, params or {})
-    return [dict(row) for row in cursor.fetchall()]
+def rows(connection: duckdb.DuckDBPyConnection, sql: str) -> list[dict]:
+    cursor = connection.execute(sql)
+    columns = [column[0] for column in cursor.description]
+    return [dict(zip(columns, record)) for record in cursor.fetchall()]
 
 
-def load_sql(name: str) -> str:
-    return (QUERY_DIR / f"{name}.sql").read_text(encoding="utf-8")
-
-
-def summarize(connection: sqlite3.Connection) -> dict:
-    """Build the full metrics payload consumed by the dashboard."""
-    totals = run_query(
+def summarize(connection: duckdb.DuckDBPyConnection) -> dict:
+    totals = rows(
         connection,
         """
-        SELECT
-            (SELECT COUNT(*) FROM jobs)                     AS jobs,
-            (SELECT COUNT(DISTINCT company) FROM jobs)      AS companies,
-            (SELECT COUNT(DISTINCT category) FROM jobs)     AS categories,
-            (SELECT COUNT(*) FROM job_skills)               AS skill_mentions
+        select
+            (select count(*) from stg_jobs)                    as jobs,
+            (select count(distinct company) from stg_jobs)     as companies,
+            (select count(*) from job_skills)                  as skill_mentions,
+            (select count(distinct category) from stg_jobs)    as categories
         """,
     )[0]
 
-    categories = run_query(connection, load_sql("categories"))
-    top_skills = run_query(connection, load_sql("top_skills"))
-    seniority = run_query(connection, load_sql("seniority"))
+    top_skills = rows(
+        connection,
+        "select skill, postings, pct_of_jobs from skill_demand order by postings desc limit 25",
+    )
+    categories = rows(
+        connection,
+        "select role_family, postings, companies, avg_skills_listed from role_families order by postings desc",
+    )
+    seniority = rows(
+        connection,
+        "select seniority, postings, avg_skills_listed from seniority_mix order by postings desc",
+    )
+    by_category = rows(
+        connection,
+        "select role_family, skill, postings from top_skills_by_family order by role_family, rank_in_family",
+    )
+    pairs = rows(
+        connection,
+        """
+        with top as (
+            select skill from skill_demand order by postings desc limit 3
+        )
+        select
+            top.skill as anchor,
+            other.skill as companion,
+            count(distinct other.external_id) as together
+        from job_skills top
+        join job_skills other
+            on other.external_id = top.external_id and other.skill <> top.skill
+        where top.skill in (select skill from top)
+        group by top.skill, other.skill
+        qualify row_number() over (
+            partition by top.skill order by count(distinct other.external_id) desc, other.skill
+        ) <= 10
+        order by top.skill, together desc
+        """,
+    )
 
-    # Per-category top skills for the biggest categories only, to keep it small.
-    by_category = {}
-    for row in categories[:6]:
-        name = row["category"]
-        by_category[name] = run_query(
-            connection, load_sql("skills_by_category"), {"category": name}
+    # Reshape into the nested shape the dashboard expects.
+    by_category_map: dict[str, list] = {}
+    for row in by_category:
+        by_category_map.setdefault(row["role_family"], []).append(
+            {"skill": row["skill"], "postings": row["postings"]}
         )
 
-    # Co-occurrence for the top three skills.
-    pairs = {}
-    for row in top_skills[:3]:
-        name = row["skill"]
-        pairs[name] = run_query(connection, load_sql("skill_pairs"), {"skill": name})
+    pairs_map: dict[str, list] = {}
+    for row in pairs:
+        pairs_map.setdefault(row["anchor"], []).append(
+            {"companion": row["companion"], "together": row["together"]}
+        )
 
     return {
         "totals": totals,
         "categories": categories,
         "topSkills": top_skills,
         "seniority": seniority,
-        "byCategory": by_category,
-        "skillPairs": pairs,
+        "byCategory": by_category_map,
+        "skillPairs": pairs_map,
     }
 
 
 def analyze() -> dict:
-    connection = sqlite3.connect(DB_PATH)
+    connection = duckdb.connect(str(WAREHOUSE), read_only=True)
     try:
         payload = summarize(connection)
     finally:

@@ -1,0 +1,13 @@
+# dbt profile for the job-market warehouse (DuckDB).
+#
+# DuckDB keeps the whole warehouse in a single file, which makes this project
+# runnable anywhere with zero infrastructure. Point the path at the file the
+# loader writes.
+
+job_market:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('JMA_WAREHOUSE', '../data/warehouse.duckdb') }}"
+      threads: 4

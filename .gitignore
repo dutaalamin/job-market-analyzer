@@ -3,3 +3,9 @@ __pycache__/
 data/raw/*.json
 data/jobs.db
 .vercel
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+data/warehouse.duckdb

@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw postings written by the Python loader.
+    schema: main
+    tables:
+      - name: raw_jobs
+        description: One row per collected job posting, with skills as a list.
+        columns:
+          - name: external_id
+            description: Stable id from the source (slug or url).
+            tests: [not_null, unique]
+          - name: title
+            tests: [not_null]
+          - name: company
+            tests: [not_null]

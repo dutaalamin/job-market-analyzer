@@ -1,389 +1,404 @@
 {
   "totals": {
-    "jobs": 2586,
-    "companies": 1015,
-    "categories": 11,
-    "skill_mentions": 4229
+    "jobs": 2604,
+    "companies": 1012,
+    "skill_mentions": 4379,
+    "categories": 11
   },
   "categories": [
     {
-      "category": "Other",
-      "postings": 723
+      "role_family": "Other",
+      "postings": 720,
+      "companies": 344,
+      "avg_skills_listed": 0.5
     },
     {
-      "category": "Engineering",
-      "postings": 610
+      "role_family": "Engineering",
+      "postings": 616,
+      "companies": 305,
+      "avg_skills_listed": 3.7
     },
     {
-      "category": "Data",
-      "postings": 362
+      "role_family": "Data",
+      "postings": 376,
+      "companies": 222,
+      "avg_skills_listed": 3.6
     },
     {
-      "category": "Sales",
-      "postings": 222
+      "role_family": "Sales",
+      "postings": 227,
+      "companies": 144,
+      "avg_skills_listed": 0.5
     },
     {
-      "category": "Marketing",
-      "postings": 163
+      "role_family": "Marketing",
+      "postings": 165,
+      "companies": 131,
+      "avg_skills_listed": 0.4
     },
     {
-      "category": "Operations",
-      "postings": 122
+      "role_family": "Operations",
+      "postings": 114,
+      "companies": 78,
+      "avg_skills_listed": 0.6
     },
     {
-      "category": "Finance",
-      "postings": 105
+      "role_family": "Finance",
+      "postings": 106,
+      "companies": 77,
+      "avg_skills_listed": 0.3
     },
     {
-      "category": "Support",
-      "postings": 88
+      "role_family": "Support",
+      "postings": 85,
+      "companies": 71,
+      "avg_skills_listed": 0.4
     },
     {
-      "category": "Product",
-      "postings": 83
+      "role_family": "Product",
+      "postings": 84,
+      "companies": 69,
+      "avg_skills_listed": 0.7
     },
     {
-      "category": "Design",
-      "postings": 55
+      "role_family": "Design",
+      "postings": 58,
+      "companies": 48,
+      "avg_skills_listed": 1.0
     },
     {
-      "category": "HR",
-      "postings": 53
+      "role_family": "HR",
+      "postings": 53,
+      "companies": 43,
+      "avg_skills_listed": 0.4
     }
   ],
   "topSkills": [
     {
       "skill": "Next.js",
-      "postings": 490
+      "postings": 501,
+      "pct_of_jobs": 19.2
     },
     {
       "skill": "Python",
-      "postings": 401
+      "postings": 399,
+      "pct_of_jobs": 15.3
     },
     {
       "skill": "CI/CD",
-      "postings": 214
+      "postings": 222,
+      "pct_of_jobs": 8.5
     },
     {
       "skill": "SQL",
-      "postings": 211
+      "postings": 215,
+      "pct_of_jobs": 8.3
     },
     {
       "skill": "REST",
-      "postings": 185
+      "postings": 201,
+      "pct_of_jobs": 7.7
     },
     {
       "skill": "AWS",
-      "postings": 178
+      "postings": 186,
+      "pct_of_jobs": 7.1
     },
     {
       "skill": "Kubernetes",
-      "postings": 166
+      "postings": 175,
+      "pct_of_jobs": 6.7
     },
     {
       "skill": "Azure",
-      "postings": 156
-    },
-    {
-      "skill": "Machine Learning",
-      "postings": 131
+      "postings": 171,
+      "pct_of_jobs": 6.6
     },
     {
       "skill": "TypeScript",
-      "postings": 128
+      "postings": 135,
+      "pct_of_jobs": 5.2
+    },
+    {
+      "skill": "Machine Learning",
+      "postings": 134,
+      "pct_of_jobs": 5.1
     },
     {
       "skill": "Docker",
-      "postings": 119
+      "postings": 127,
+      "pct_of_jobs": 4.9
     },
     {
       "skill": "GCP",
-      "postings": 118
+      "postings": 125,
+      "pct_of_jobs": 4.8
     },
     {
       "skill": "React",
-      "postings": 111
+      "postings": 117,
+      "pct_of_jobs": 4.5
     },
     {
       "skill": "Java",
-      "postings": 105
+      "postings": 109,
+      "pct_of_jobs": 4.2
     },
     {
       "skill": "PostgreSQL",
-      "postings": 104
-    },
-    {
-      "skill": "Linux",
-      "postings": 101
+      "postings": 105,
+      "pct_of_jobs": 4.0
     },
     {
       "skill": "Terraform",
-      "postings": 93
+      "postings": 100,
+      "pct_of_jobs": 3.8
+    },
+    {
+      "skill": "Linux",
+      "postings": 100,
+      "pct_of_jobs": 3.8
     },
     {
       "skill": "Git",
-      "postings": 90
+      "postings": 91,
+      "pct_of_jobs": 3.5
     },
     {
       "skill": "JavaScript",
-      "postings": 68
+      "postings": 67,
+      "pct_of_jobs": 2.6
     },
     {
       "skill": "C++",
-      "postings": 61
+      "postings": 64,
+      "pct_of_jobs": 2.5
     },
     {
       "skill": "Kafka",
-      "postings": 60
+      "postings": 60,
+      "pct_of_jobs": 2.3
     },
     {
       "skill": "Node.js",
-      "postings": 59
-    },
-    {
-      "skill": "Snowflake",
-      "postings": 49
+      "postings": 58,
+      "pct_of_jobs": 2.2
     },
     {
       "skill": "Rust",
-      "postings": 47
+      "postings": 51,
+      "pct_of_jobs": 2.0
     },
     {
-      "skill": "Elasticsearch",
-      "postings": 44
+      "skill": "Snowflake",
+      "postings": 50,
+      "pct_of_jobs": 1.9
+    },
+    {
+      "skill": "Figma",
+      "postings": 45,
+      "pct_of_jobs": 1.7
     }
   ],
   "seniority": [
     {
       "seniority": "Mid",
-      "postings": 1568
+      "postings": 1559,
+      "avg_skills_listed": 1.3
     },
     {
       "seniority": "Senior",
-      "postings": 621
+      "postings": 647,
+      "avg_skills_listed": 2.4
     },
     {
       "seniority": "Lead",
-      "postings": 187
+      "postings": 182,
+      "avg_skills_listed": 1.7
     },
     {
       "seniority": "Junior",
-      "postings": 137
+      "postings": 138,
+      "avg_skills_listed": 1.4
     },
     {
       "seniority": "Staff",
-      "postings": 40
+      "postings": 40,
+      "avg_skills_listed": 3.8
     },
     {
       "seniority": "Principal",
-      "postings": 33
+      "postings": 38,
+      "avg_skills_listed": 3.7
     }
   ],
   "byCategory": {
-    "Other": [
-      {
-        "skill": "Next.js",
-        "postings": 90
-      },
-      {
-        "skill": "REST",
-        "postings": 20
-      },
+    "Data": [
       {
         "skill": "Python",
-        "postings": 19
+        "postings": 176
       },
       {
         "skill": "SQL",
-        "postings": 14
+        "postings": 102
       },
       {
-        "skill": "CI/CD",
-        "postings": 12
-      },
-      {
-        "skill": "Linux",
-        "postings": 12
-      },
-      {
-        "skill": "Kubernetes",
-        "postings": 11
-      },
-      {
-        "skill": "AWS",
-        "postings": 10
-      },
-      {
-        "skill": "Azure",
-        "postings": 10
-      },
-      {
-        "skill": "TypeScript",
-        "postings": 10
-      },
-      {
-        "skill": "Java",
-        "postings": 9
+        "skill": "Next.js",
+        "postings": 80
       },
       {
         "skill": "Machine Learning",
-        "postings": 9
+        "postings": 72
+      },
+      {
+        "skill": "CI/CD",
+        "postings": 69
+      },
+      {
+        "skill": "AWS",
+        "postings": 68
+      },
+      {
+        "skill": "Azure",
+        "postings": 67
+      },
+      {
+        "skill": "GCP",
+        "postings": 53
+      }
+    ],
+    "Design": [
+      {
+        "skill": "Figma",
+        "postings": 24
+      },
+      {
+        "skill": "Next.js",
+        "postings": 13
+      },
+      {
+        "skill": "CSS",
+        "postings": 4
+      },
+      {
+        "skill": "REST",
+        "postings": 3
+      },
+      {
+        "skill": "Git",
+        "postings": 2
+      },
+      {
+        "skill": "HTML",
+        "postings": 2
+      },
+      {
+        "skill": "React",
+        "postings": 2
+      },
+      {
+        "skill": "AWS",
+        "postings": 1
       }
     ],
     "Engineering": [
       {
         "skill": "Python",
-        "postings": 197
+        "postings": 191
       },
       {
         "skill": "Next.js",
-        "postings": 146
+        "postings": 151
       },
       {
         "skill": "CI/CD",
-        "postings": 137
+        "postings": 140
       },
       {
         "skill": "Kubernetes",
-        "postings": 105
+        "postings": 108
       },
       {
         "skill": "REST",
-        "postings": 94
+        "postings": 100
       },
       {
         "skill": "AWS",
-        "postings": 92
+        "postings": 97
       },
       {
         "skill": "TypeScript",
-        "postings": 83
-      },
-      {
-        "skill": "React",
-        "postings": 80
+        "postings": 89
       },
       {
         "skill": "Azure",
-        "postings": 79
-      },
-      {
-        "skill": "Java",
-        "postings": 75
-      },
-      {
-        "skill": "Linux",
-        "postings": 72
-      },
-      {
-        "skill": "Docker",
-        "postings": 70
+        "postings": 86
       }
     ],
-    "Data": [
-      {
-        "skill": "Python",
-        "postings": 172
-      },
+    "Finance": [
       {
         "skill": "SQL",
-        "postings": 96
+        "postings": 9
       },
       {
         "skill": "Next.js",
-        "postings": 80
-      },
-      {
-        "skill": "Machine Learning",
-        "postings": 71
-      },
-      {
-        "skill": "AWS",
-        "postings": 64
-      },
-      {
-        "skill": "CI/CD",
-        "postings": 63
-      },
-      {
-        "skill": "Azure",
-        "postings": 57
-      },
-      {
-        "skill": "GCP",
-        "postings": 49
-      },
-      {
-        "skill": "Kubernetes",
-        "postings": 44
-      },
-      {
-        "skill": "Docker",
-        "postings": 43
-      },
-      {
-        "skill": "Snowflake",
-        "postings": 35
-      },
-      {
-        "skill": "dbt",
-        "postings": 32
-      }
-    ],
-    "Sales": [
-      {
-        "skill": "Next.js",
-        "postings": 46
-      },
-      {
-        "skill": "REST",
-        "postings": 12
-      },
-      {
-        "skill": "AWS",
-        "postings": 7
-      },
-      {
-        "skill": "Azure",
         "postings": 6
       },
       {
-        "skill": "Elasticsearch",
-        "postings": 5
-      },
-      {
-        "skill": "SQL",
-        "postings": 5
-      },
-      {
-        "skill": "GCP",
+        "skill": "REST",
         "postings": 4
       },
       {
+        "skill": "BigQuery",
+        "postings": 3
+      },
+      {
+        "skill": "dbt",
+        "postings": 3
+      },
+      {
         "skill": "Python",
-        "postings": 3
-      },
-      {
-        "skill": "Vue",
-        "postings": 3
-      },
-      {
-        "skill": "ETL",
         "postings": 2
+      },
+      {
+        "skill": "HTML",
+        "postings": 1
       },
       {
         "skill": "Machine Learning",
+        "postings": 1
+      }
+    ],
+    "HR": [
+      {
+        "skill": "Next.js",
+        "postings": 14
+      },
+      {
+        "skill": "Machine Learning",
+        "postings": 4
+      },
+      {
+        "skill": "REST",
         "postings": 2
       },
       {
-        "skill": "Snowflake",
-        "postings": 2
+        "skill": "Java",
+        "postings": 1
+      },
+      {
+        "skill": "Kubernetes",
+        "postings": 1
+      },
+      {
+        "skill": "SQL",
+        "postings": 1
       }
     ],
     "Marketing": [
       {
         "skill": "Next.js",
-        "postings": 25
+        "postings": 27
       },
       {
         "skill": "REST",
@@ -412,28 +427,12 @@
       {
         "skill": "HTML",
         "postings": 2
-      },
-      {
-        "skill": "JavaScript",
-        "postings": 2
-      },
-      {
-        "skill": "BigQuery",
-        "postings": 1
-      },
-      {
-        "skill": "Linux",
-        "postings": 1
-      },
-      {
-        "skill": "Machine Learning",
-        "postings": 1
       }
     ],
     "Operations": [
       {
         "skill": "Next.js",
-        "postings": 43
+        "postings": 39
       },
       {
         "skill": "SQL",
@@ -449,7 +448,7 @@
       },
       {
         "skill": "GCP",
-        "postings": 3
+        "postings": 2
       },
       {
         "skill": "AWS",
@@ -462,50 +461,212 @@
       {
         "skill": "C#",
         "postings": 1
+      }
+    ],
+    "Other": [
+      {
+        "skill": "Next.js",
+        "postings": 95
+      },
+      {
+        "skill": "REST",
+        "postings": 28
+      },
+      {
+        "skill": "Python",
+        "postings": 18
+      },
+      {
+        "skill": "SQL",
+        "postings": 13
       },
       {
         "skill": "CI/CD",
-        "postings": 1
+        "postings": 11
       },
       {
-        "skill": "Figma",
-        "postings": 1
+        "skill": "Kubernetes",
+        "postings": 11
       },
       {
         "skill": "Linux",
-        "postings": 1
+        "postings": 11
       },
       {
-        "skill": "MongoDB",
+        "skill": "TypeScript",
+        "postings": 10
+      }
+    ],
+    "Product": [
+      {
+        "skill": "Next.js",
+        "postings": 25
+      },
+      {
+        "skill": "REST",
+        "postings": 8
+      },
+      {
+        "skill": "SQL",
+        "postings": 7
+      },
+      {
+        "skill": "Kubernetes",
+        "postings": 4
+      },
+      {
+        "skill": "Machine Learning",
+        "postings": 3
+      },
+      {
+        "skill": "Python",
+        "postings": 3
+      },
+      {
+        "skill": "Figma",
+        "postings": 2
+      },
+      {
+        "skill": "Azure",
+        "postings": 1
+      }
+    ],
+    "Sales": [
+      {
+        "skill": "Next.js",
+        "postings": 44
+      },
+      {
+        "skill": "REST",
+        "postings": 12
+      },
+      {
+        "skill": "AWS",
+        "postings": 7
+      },
+      {
+        "skill": "Azure",
+        "postings": 6
+      },
+      {
+        "skill": "SQL",
+        "postings": 6
+      },
+      {
+        "skill": "Elasticsearch",
+        "postings": 5
+      },
+      {
+        "skill": "GCP",
+        "postings": 4
+      },
+      {
+        "skill": "Python",
+        "postings": 4
+      }
+    ],
+    "Support": [
+      {
+        "skill": "Next.js",
+        "postings": 7
+      },
+      {
+        "skill": "REST",
+        "postings": 5
+      },
+      {
+        "skill": "Node.js",
+        "postings": 4
+      },
+      {
+        "skill": "React",
+        "postings": 4
+      },
+      {
+        "skill": "TypeScript",
+        "postings": 4
+      },
+      {
+        "skill": "Azure",
+        "postings": 3
+      },
+      {
+        "skill": "Python",
+        "postings": 3
+      },
+      {
+        "skill": "AWS",
         "postings": 1
       }
     ]
   },
   "skillPairs": {
+    "CI/CD": [
+      {
+        "companion": "Python",
+        "together": 116
+      },
+      {
+        "companion": "Kubernetes",
+        "together": 89
+      },
+      {
+        "companion": "AWS",
+        "together": 79
+      },
+      {
+        "companion": "Docker",
+        "together": 78
+      },
+      {
+        "companion": "Azure",
+        "together": 69
+      },
+      {
+        "companion": "Terraform",
+        "together": 62
+      },
+      {
+        "companion": "GCP",
+        "together": 55
+      },
+      {
+        "companion": "Git",
+        "together": 55
+      },
+      {
+        "companion": "REST",
+        "together": 52
+      },
+      {
+        "companion": "Java",
+        "together": 44
+      }
+    ],
     "Next.js": [
       {
         "companion": "Python",
         "together": 81
       },
       {
-        "companion": "SQL",
-        "together": 48
+        "companion": "REST",
+        "together": 51
       },
       {
-        "companion": "REST",
-        "together": 40
+        "companion": "SQL",
+        "together": 49
       },
       {
         "companion": "Machine Learning",
-        "together": 39
+        "together": 40
       },
       {
         "companion": "AWS",
-        "together": 35
+        "together": 39
       },
       {
         "companion": "Kubernetes",
-        "together": 35
+        "together": 36
       },
       {
         "companion": "CI/CD",
@@ -513,33 +674,33 @@
       },
       {
         "companion": "TypeScript",
-        "together": 28
+        "together": 31
       },
       {
         "companion": "React",
-        "together": 27
+        "together": 29
       },
       {
         "companion": "Azure",
-        "together": 25
+        "together": 28
       }
     ],
     "Python": [
       {
         "companion": "CI/CD",
-        "together": 110
+        "together": 116
       },
       {
         "companion": "SQL",
-        "together": 105
+        "together": 106
       },
       {
         "companion": "AWS",
-        "together": 102
+        "together": 103
       },
       {
         "companion": "Kubernetes",
-        "together": 83
+        "together": 89
       },
       {
         "companion": "Next.js",
@@ -547,65 +708,23 @@
       },
       {
         "companion": "GCP",
+        "together": 78
+      },
+      {
+        "companion": "Azure",
+        "together": 77
+      },
+      {
+        "companion": "Docker",
         "together": 76
       },
       {
         "companion": "Machine Learning",
-        "together": 70
-      },
-      {
-        "companion": "Azure",
-        "together": 69
-      },
-      {
-        "companion": "Docker",
-        "together": 69
-      },
-      {
-        "companion": "PostgreSQL",
-        "together": 65
-      }
-    ],
-    "CI/CD": [
-      {
-        "companion": "Python",
-        "together": 110
-      },
-      {
-        "companion": "Kubernetes",
-        "together": 82
-      },
-      {
-        "companion": "AWS",
-        "together": 76
-      },
-      {
-        "companion": "Docker",
         "together": 72
       },
       {
-        "companion": "Azure",
-        "together": 61
-      },
-      {
-        "companion": "Terraform",
-        "together": 56
-      },
-      {
-        "companion": "Git",
-        "together": 54
-      },
-      {
-        "companion": "GCP",
-        "together": 49
-      },
-      {
-        "companion": "REST",
-        "together": 47
-      },
-      {
         "companion": "TypeScript",
-        "together": 43
+        "together": 67
       }
     ]
   }

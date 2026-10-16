@@ -5,98 +5,115 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Job Market Analyzer</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
   :root {
-    --bg:#0c0b09; --panel:#131210; --line:#242220; --ink:#f2efe9;
-    --muted:#8b857c; --accent:#e2b714; --accent2:#5ea9ff;
+    --bg:#0c0b09;
+    --ink:#f2efe9;
+    --muted:#8b857c;
+    --accent:#e2b714;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;
     -webkit-font-smoothing:antialiased;line-height:1.5}
-  .wrap{max-width:1180px;margin:0 auto;padding:56px 28px 80px}
+  .wrap{max-width:1080px;margin:0 auto;padding:72px 32px 100px}
 
-  header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:40px}
-  .kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.24em;
-    text-transform:uppercase;color:var(--accent);margin-bottom:14px}
-  h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:800;letter-spacing:-.03em;line-height:1.02}
-  .sub{margin-top:14px;color:var(--muted);font-size:15px;max-width:640px}
-  .meta{margin-top:18px;display:flex;gap:22px;flex-wrap:wrap;
-    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
-  .meta b{color:var(--ink)}
+  h1{font-size:clamp(2.2rem,5.4vw,3.8rem);font-weight:900;letter-spacing:-.035em;
+    line-height:1.0;max-width:16ch}
+  .sub{margin-top:22px;color:var(--muted);font-size:16px;max-width:56ch;line-height:1.6}
 
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:52px}
-  .card{border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--panel)}
-  .card .n{font-size:32px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-  .card .l{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--muted);margin-top:6px}
+  /* stat row: no boxes, just big numbers */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin:64px 0 88px}
+  .stat .n{font-size:clamp(1.8rem,3.6vw,2.6rem);font-weight:800;letter-spacing:-.03em;
+    font-variant-numeric:tabular-nums;line-height:1}
+  .stat .l{margin-top:8px;font-size:12.5px;color:var(--muted);letter-spacing:.02em}
 
-  section{margin-bottom:56px}
-  h2{font-size:13px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--muted);margin-bottom:22px;
-    display:flex;align-items:center;gap:12px}
-  h2::after{content:'';flex:1;height:1px;background:var(--line)}
+  section{margin-bottom:84px}
+  h2{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:32px}
 
-  .bars{display:flex;flex-direction:column;gap:9px}
-  .bar{display:grid;grid-template-columns:150px 1fr 52px;align-items:center;gap:14px}
-  .bar .name{font-size:13.5px;font-weight:600;text-align:right;color:var(--ink)}
-  .bar .track{height:22px;background:#1a1815;border-radius:6px;overflow:hidden;display:block}
-  .bar .fill{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#f5d24a);
-    border-radius:6px;transition:width .6s cubic-bezier(.16,1,.3,1)}
-  .bar .val{font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  /* bars: no track boxes, just a thin fill */
+  .bars{display:flex;flex-direction:column;gap:14px}
+  .bar{display:grid;grid-template-columns:170px 1fr 130px;align-items:baseline;gap:20px}
+  .bar .name{font-size:14.5px;font-weight:600;text-align:right}
+  .bar .track{position:relative;height:10px;border-radius:999px;background:#1b1915;
+    align-self:center;overflow:hidden}
+  .bar .fill{position:absolute;inset:0 auto 0 0;border-radius:999px;
+    background:linear-gradient(90deg,var(--accent),#f6d64d);
+    transition:width .7s cubic-bezier(.16,1,.3,1)}
+  .bar .val{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);
+    font-variant-numeric:tabular-nums}
+  .bar .val b{color:var(--ink);font-weight:500}
+
+  /* flow: plain text, arrows between, no boxes */
+  .flow{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;
+    font-family:'JetBrains Mono',monospace;font-size:14px}
+  .flow .step{color:var(--ink);font-weight:500}
+  .flow .step span{color:var(--accent)}
+  .flow .arrow{color:#4a453c}
+  .flow-note{margin-top:22px;font-size:14px;color:var(--muted);max-width:62ch;line-height:1.6}
+  .flow-note b{color:var(--ink);font-weight:600}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:64px}
+
+  /* donut + legend, no box */
+  .donut{display:flex;align-items:center;gap:30px}
+  .donut svg{flex-shrink:0}
+  .legend{display:flex;flex-direction:column;gap:11px;font-size:13.5px;flex:1}
+  .legend div{display:flex;align-items:center;gap:10px}
+  .legend .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .legend .ct{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12.5px;
     color:var(--muted);font-variant-numeric:tabular-nums}
 
-  .split{display:grid;grid-template-columns:1fr 1fr;gap:36px}
-  .donut{display:flex;align-items:center;gap:26px}
-  .donut svg{flex-shrink:0}
-  .legend{display:flex;flex-direction:column;gap:9px;font-size:13px}
-  .legend div{display:flex;align-items:center;gap:9px}
-  .legend .dot{width:10px;height:10px;border-radius:3px}
-  .legend .ct{margin-left:auto;font-family:'JetBrains Mono',monospace;
-    font-size:12px;color:var(--muted)}
+  /* tabs: plain text toggles, no pills */
+  .tabs{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:30px}
+  .tab{font-size:13.5px;font-weight:500;color:var(--muted);background:none;border:none;
+    cursor:pointer;padding:0 0 4px;border-bottom:2px solid transparent;transition:.15s}
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--accent);border-bottom-color:var(--accent)}
 
-  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-  .tab{font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 13px;
-    border:1px solid var(--line);border-radius:999px;color:var(--muted);
-    background:transparent;cursor:pointer;transition:.15s}
-  .tab:hover{color:var(--ink);border-color:#3a3733}
-  .tab.on{background:var(--accent);border-color:var(--accent);color:#0c0b09;font-weight:600}
-
-  .pairs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .paircard{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--panel)}
-  .paircard h3{font-size:13px;margin-bottom:12px}
-  .paircard h3 span{color:var(--accent)}
-  .pair{display:flex;justify-content:space-between;font-size:12.5px;
-    padding:4px 0;color:var(--muted)}
-  .pair b{color:var(--ink);font-weight:600}
+  /* pairs: plain columns */
+  .pairs{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+  .pairs h3{font-size:14px;font-weight:700;margin-bottom:16px}
+  .pairs h3 span{color:var(--accent)}
+  .pair{display:flex;justify-content:space-between;font-size:13.5px;
+    padding:5px 0;color:var(--muted)}
+  .pair b{color:var(--ink);font-weight:500}
   .pair .c{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
 
-  footer{border-top:1px solid var(--line);padding-top:22px;margin-top:20px;
-    font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);
-    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer{margin-top:20px;font-size:13px;color:#5f5a51}
 
   @media(max-width:900px){
-    .cards{grid-template-columns:repeat(2,1fr)}
-    .split{grid-template-columns:1fr;gap:44px}
-    .pairs{grid-template-columns:1fr}
-    .bar{grid-template-columns:104px 1fr 44px;gap:10px}
+    .stats{grid-template-columns:repeat(2,1fr);gap:32px}
+    .split{grid-template-columns:1fr;gap:64px}
+    .pairs{grid-template-columns:1fr;gap:36px}
+    .bar{grid-template-columns:110px 1fr 96px;gap:12px}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="kicker">Data pipeline · Python · SQL</div>
-    <h1>Which skills are the job market<br>actually asking for?</h1>
-    <p class="sub">An end-to-end pipeline that collects remote job postings, cleans and
-      normalises them, loads them into SQLite, and answers that question with SQL.</p>
-    <div class="meta">
-      <span>source · <b id="src">Arbeitnow API</b></span>
-      <span>updated · <b id="upd">—</b></span>
-      <span>stack · <b>Python · SQLite · SQL</b></span>
-    </div>
-  </header>
+  <h1>Which skills are the job market actually asking for?</h1>
+  <p class="sub">An end-to-end data platform that collects remote job postings, models them
+    in a dbt-managed warehouse, and answers that question with SQL.</p>
 
-  <div class="cards" id="cards"></div>
+  <div class="stats" id="stats"></div>
+
+  <section>
+    <h2>Pipeline and orchestration</h2>
+    <div class="flow">
+      <span class="step">collect<span>.py</span></span>
+      <span class="arrow">→</span>
+      <span class="step">transform<span>.py</span></span>
+      <span class="arrow">→</span>
+      <span class="step">load<span>.py</span></span>
+      <span class="arrow">→</span>
+      <span class="step">dbt</span>
+      <span class="arrow">→</span>
+      <span class="step">analyze<span>.py</span></span>
+    </div>
+    <p class="flow-note">Scheduled daily by an <b>Apache Airflow</b> DAG. The dbt layer models
+      the warehouse and enforces <b>27 data-quality tests</b>, all passing.</p>
+  </section>
 
   <section>
     <h2>Most in-demand skills</h2>
@@ -125,10 +142,7 @@
     <div class="pairs" id="pairs"></div>
   </section>
 
-  <footer>
-    <span>Job Market Analyzer — portfolio project by Duta Alamin</span>
-    <span>collect → transform → load → analyze</span>
-  </footer>
+  <footer>Job Market Analyzer. Portfolio project by Duta Alamin.</footer>
 </div>
 
 <script>
@@ -137,45 +151,50 @@ const PALETTE = ['#e2b714','#5ea9ff','#8b7cf6','#ff7f50','#00b894','#ff6b9f','#f
 async function load() {
   const res = await fetch('./data/metrics.json');
   const d = await res.json();
-
-  document.getElementById('upd').textContent = new Date().toISOString().slice(0,10);
-
-  // Stat cards
   const t = d.totals;
-  document.getElementById('cards').innerHTML = [
+
+  // Stats
+  document.getElementById('stats').innerHTML = [
     ['Jobs analysed', t.jobs],
     ['Companies', t.companies],
     ['Skill mentions', t.skill_mentions],
     ['Role families', t.categories],
-  ].map(([l,n]) => `<div class="card"><div class="n">${n.toLocaleString()}</div><div class="l">${l}</div></div>`).join('');
+  ].map(([l,n]) =>
+    `<div class="stat"><div class="n">${n.toLocaleString()}</div><div class="l">${l}</div></div>`
+  ).join('');
 
-  // Skills bars
+  // Skills
   const maxSkill = d.topSkills[0]?.postings || 1;
   document.getElementById('skills').innerHTML = d.topSkills.slice(0,15).map(s => `
     <div class="bar">
       <span class="name">${s.skill}</span>
       <span class="track"><span class="fill" style="width:${(s.postings/maxSkill*100).toFixed(1)}%"></span></span>
-      <span class="val">${s.postings}</span>
+      <span class="val"><b>${s.postings}</b>${s.pct_of_jobs != null ? ` · ${s.pct_of_jobs}%` : ''}</span>
     </div>`).join('');
 
   // Donut
   const cats = d.categories.filter(c => c.postings > 0);
   const total = cats.reduce((a,c) => a + c.postings, 0);
+  const top = cats.slice(0, 7);
   let acc = 0;
-  const R = 62, C = 2*Math.PI*R;
+  const R = 60, C = 2*Math.PI*R;
   const arcs = cats.map((c,i) => {
     const frac = c.postings/total;
-    const seg = `<circle r="${R}" cx="80" cy="80" fill="none" stroke="${PALETTE[i%PALETTE.length]}"
-      stroke-width="26" stroke-dasharray="${(frac*C).toFixed(2)} ${C}"
-      stroke-dashoffset="${(-acc*C).toFixed(2)}" transform="rotate(-90 80 80)"/>`;
+    const seg = `<circle r="${R}" cx="76" cy="76" fill="none" stroke="${PALETTE[i%PALETTE.length]}"
+      stroke-width="22" stroke-dasharray="${(frac*C).toFixed(2)} ${C}"
+      stroke-dashoffset="${(-acc*C).toFixed(2)}" transform="rotate(-90 76 76)"/>`;
     acc += frac;
     return seg;
   }).join('');
+  const rest = cats.slice(7).reduce((a,c) => a + c.postings, 0);
   document.getElementById('donut').innerHTML = `
-    <svg width="160" height="160" viewBox="0 0 160 160">${arcs}</svg>
-    <div class="legend">${cats.map((c,i) => `
-      <div><span class="dot" style="background:${PALETTE[i%PALETTE.length]}"></span>
-      ${c.category}<span class="ct">${c.postings}</span></div>`).join('')}</div>`;
+    <svg width="152" height="152" viewBox="0 0 152 152">${arcs}</svg>
+    <div class="legend">
+      ${top.map((c,i) => `
+        <div><span class="dot" style="background:${PALETTE[i%PALETTE.length]}"></span>
+        ${c.role_family}<span class="ct">${c.postings}</span></div>`).join('')}
+      ${rest ? `<div><span class="dot" style="background:#3a352c"></span>Other<span class="ct">${rest}</span></div>` : ''}
+    </div>`;
 
   // Seniority
   const maxSen = Math.max(...d.seniority.map(s => s.postings));
@@ -183,10 +202,10 @@ async function load() {
     <div class="bar">
       <span class="name">${s.seniority}</span>
       <span class="track"><span class="fill" style="width:${(s.postings/maxSen*100).toFixed(1)}%;background:linear-gradient(90deg,#5ea9ff,#8b7cf6)"></span></span>
-      <span class="val">${s.postings}</span>
+      <span class="val"><b>${s.postings}</b></span>
     </div>`).join('');
 
-  // Tabs by category
+  // Tabs
   const names = Object.keys(d.byCategory);
   const tabs = document.getElementById('tabs');
   const bycat = document.getElementById('bycat');
@@ -197,7 +216,7 @@ async function load() {
       <div class="bar">
         <span class="name">${s.skill}</span>
         <span class="track"><span class="fill" style="width:${(s.postings/mx*100).toFixed(1)}%"></span></span>
-        <span class="val">${s.postings}</span>
+        <span class="val"><b>${s.postings}</b></span>
       </div>`).join('') || '<p style="color:var(--muted)">No data</p>';
   }
   tabs.innerHTML = names.map((n,i) =>
@@ -210,9 +229,9 @@ async function load() {
   });
   if (names.length) renderCat(names[0]);
 
-  // Skill pairs
+  // Pairs
   document.getElementById('pairs').innerHTML = Object.entries(d.skillPairs).map(([skill, list]) => `
-    <div class="paircard">
+    <div>
       <h3>Pairs with <span>${skill}</span></h3>
       ${list.map(p => `<div class="pair"><b>${p.companion}</b><span class="c">${p.together}</span></div>`).join('')}
     </div>`).join('');
@@ -220,7 +239,7 @@ async function load() {
 
 load().catch(e => {
   document.body.innerHTML = '<div style="padding:40px;font-family:monospace;color:#e2b714">'
-    + 'Failed to load metrics.json — run the pipeline first.<br><br>' + e + '</div>';
+    + 'Failed to load metrics.json. Run the pipeline first.<br><br>' + e + '</div>';
 });
 </script>
 </body>

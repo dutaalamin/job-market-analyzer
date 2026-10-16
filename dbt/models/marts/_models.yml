@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_jobs
+    description: Cleaned postings, one row per job.
+    columns:
+      - name: external_id
+        description: Unique id from the source.
+        tests:
+          - not_null
+          - unique
+      - name: title
+        tests: [not_null]
+      - name: company
+        tests: [not_null]
+      - name: category
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Engineering', 'Data', 'Design', 'Product', 'Marketing',
+                       'Sales', 'Finance', 'Support', 'Operations', 'HR', 'Other']
+      - name: seniority
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Principal', 'Staff', 'Lead', 'Senior', 'Mid', 'Junior']
+
+  - name: job_skills
+    description: Exploded (job, skill) pairs.
+    columns:
+      - name: external_id
+        tests: [not_null]
+      - name: skill
+        tests: [not_null]
+
+  - name: skill_demand
+    description: Skill popularity with share-of-market.
+    columns:
+      - name: skill
+        tests: [not_null, unique]
+      - name: postings
+        tests: [not_null]
+      - name: pct_of_jobs
+        description: Share of postings mentioning the skill (0–100).
+        tests:
+          - not_null
+
+  - name: role_families
+    columns:
+      - name: role_family
+        tests: [not_null, unique]
