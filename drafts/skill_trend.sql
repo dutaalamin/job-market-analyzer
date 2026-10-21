@@ -1,35 +1,53 @@
--- skill_trend.sql — DRAFT, not wired into dbt on purpose.
+-- skill_trend.sql — DRAFT. Write the query below the line at the bottom.
 --
--- Lives outside dbt/models so `dbt build` keeps passing while this is unfinished.
--- Move it to dbt/models/marts/ once the history exists and the query is written.
+-- Deliberately outside dbt/models so `dbt build` keeps passing (32 tests) while
+-- this is unfinished. Move it to dbt/models/marts/ once the query works.
 --
--- WHY THIS IS STILL EMPTY
--- A trend needs two points in time. Right now the data has one:
---   * every posting was published between 2026-10-09 and 2026-10-16
---   * the two raw snapshots were taken on the same day, six hours apart
---   * load.py deletes warehouse.duckdb on every run, so nothing accumulates
+-- WHAT IS ALREADY DONE
+--   * raw_jobs has snapshot_at (collector timestamp from the filename)
+--   * stg_job_history exposes one row per (posting, snapshot)
+--   * --history loads every snapshot; load() rebuilds from all of them
+--   * a daily GitHub Action appends to data/skill_history.csv
 --
--- PREREQUISITE (do these first)
---   1. load.py must rebuild from every file in data/raw/, not just the latest,
---      and raw_jobs needs a snapshot_at column.
---   2. stg_jobs must expose snapshot_at.
---   3. A daily collector has to run for at least two weeks.
+-- WHAT IS STILL MISSING
+--   * time. Both existing snapshots were taken on the same day, six hours apart.
+--     The query below will run today and return one row per skill with
+--     change_pp = 0. That is not a bug in the SQL. Wait ~14 days of daily runs.
 --
--- CONTRACT FOR THIS MODEL
---   skill                VARCHAR   skill name
---   postings_now         BIGINT    postings in the latest snapshot
---   postings_prev        BIGINT    postings in the snapshot 7 days earlier
---   pct_now              DOUBLE    share of postings, latest
---   pct_prev             DOUBLE    share of postings, previous
---   change_pp            DOUBLE    pct_now - pct_prev, in percentage points
---   One row per skill. Skills absent from the previous snapshot get
---   postings_prev = 0 rather than being dropped, otherwise "new" skills vanish.
+-- TWO SOURCES, PICK ONE
+--   A) stg_job_history (DuckDB, in-warehouse)
+--      Full posting-level detail. Can be filtered by category, seniority, remote.
+--      Requires the warehouse to be rebuilt with --history.
+--   B) data/skill_history.csv (committed, survives without raw files)
+--      One row per (snapshot, skill). Only 25 skills, but it is the file the
+--      GitHub Action actually writes, so it is the one that will have history
+--      even when the 20 MB raw snapshots are not committed.
+--      In dbt: {{ ref('...') }} will not read it. Either seed it
+--      (dbt seed from data/skill_history.csv) or read it with DuckDB's
+--      read_csv_auto().
 --
--- HINT
--- DuckDB supports window functions:
---   row_number() over (partition by skill order by snapshot_at desc) as rn
--- Keep the two most recent distinct snapshot_at values, then pivot them with
--- conditional aggregation (max(case when rn = 1 then ... end)).
+-- CONTRACT — the model must produce exactly these columns
+--   skill          VARCHAR   skill name
+--   postings_now   BIGINT    postings in the latest snapshot
+--   postings_prev  BIGINT    postings in the previous snapshot
+--   pct_now        DOUBLE    share of postings, latest        (0-100)
+--   pct_prev       DOUBLE    share of postings, previous      (0-100)
+--   change_pp      DOUBLE    pct_now - pct_prev, in percentage points
+--
+--   One row per skill, ordered by change_pp desc.
+--
+--   A skill missing from the previous snapshot must appear with
+--   postings_prev = 0, not be dropped. Otherwise a genuinely new skill — the
+--   most interesting row on the page — is the one that disappears.
+--
+-- HINTS
+--   * Rank snapshots per skill, then keep rn = 1 and rn = 2:
+--       row_number() over (partition by skill order by snapshot_at desc) as rn
+--   * Pivot with conditional aggregation:
+--       max(case when rn = 1 then postings end) as postings_now
+--   * Percentage points, not percent: 15.3 -> 16.0 is +0.7 pp, not +4.6%.
+--     Printing "+4.6%" for that move is the classic way this table lies.
+--   * Consider a minimum volume filter (postings_now >= 20). A skill going from
+--     1 to 3 postings is +200 pp of noise.
 --
 -- Write the query below this line.
-
