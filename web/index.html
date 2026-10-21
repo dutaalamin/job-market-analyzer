@@ -5,151 +5,135 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Job Market Analyzer</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
-  :root {
-    --bg:#0c0b09;
-    --ink:#f2efe9;
-    --muted:#8b857c;
-    --accent:#e2b714;
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg:#ffffff;
+    --ink:#111114;
+    --muted:#6b6b70;
+    --faint:#9a9aa2;
+    --border:#e9e9ec;
+    --surface:#f7f7f8;
+    --radius:16px;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;
-    -webkit-font-smoothing:antialiased;line-height:1.5}
-  .wrap{max-width:1080px;margin:0 auto;padding:72px 32px 100px}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.55;font-size:15px}
 
-  h1{font-size:clamp(2.2rem,5.4vw,3.8rem);font-weight:900;letter-spacing:-.035em;
-    line-height:1.0;max-width:16ch}
-  .sub{margin-top:22px;color:var(--muted);font-size:16px;max-width:56ch;line-height:1.6}
-  .prov{margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:11.5px;
-    color:#5f5a51;letter-spacing:.02em}
+  .wrap{max-width:920px;margin:0 auto;padding:56px 28px 88px}
+
+  /* header: part of the page, not a landing hero */
+  header{padding-bottom:24px;border-bottom:1px solid var(--border);margin-bottom:40px}
+  h1{font-size:1.9rem;font-weight:600;letter-spacing:-.03em;line-height:1.2;max-width:26ch}
+  .sub{margin-top:12px;color:var(--muted);max-width:58ch;line-height:1.6}
+  .prov{margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+    color:var(--faint);letter-spacing:-.01em;line-height:1.9}
   .prov b{color:var(--muted);font-weight:500}
-  .prov a{color:var(--muted);text-decoration:none;border-bottom:1px solid #2e2a24}
-  .prov a:hover{color:var(--accent);border-color:var(--accent)}
+  .prov a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--border)}
+  .prov a:hover{color:var(--ink);border-color:var(--ink)}
 
-  /* stat row: no boxes, just big numbers */
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin:64px 0 88px}
-  .stat .n{font-size:clamp(1.8rem,3.6vw,2.6rem);font-weight:800;letter-spacing:-.03em;
-    font-variant-numeric:tabular-nums;line-height:1}
-  .stat .l{margin-top:8px;font-size:12.5px;color:var(--muted);letter-spacing:.02em}
+  section{margin-bottom:52px}
+  h2{font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--faint);margin-bottom:22px}
+  h3{font-size:13px;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+  h3 span{color:var(--muted);font-weight:500}
 
-  section{margin-bottom:84px}
-  h2{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
-    color:var(--muted);margin-bottom:32px}
-
-  /* bars: no track boxes, just a thin fill */
-  .bars{display:flex;flex-direction:column;gap:14px}
-  .bar{display:grid;grid-template-columns:170px 1fr 130px;align-items:baseline;gap:20px}
-  .bar .name{font-size:14.5px;font-weight:600;text-align:right}
-  .bar .track{position:relative;height:10px;border-radius:999px;background:#1b1915;
-    align-self:center;overflow:hidden}
-  .bar .fill{position:absolute;inset:0 auto 0 0;border-radius:999px;
-    background:linear-gradient(90deg,var(--accent),#f6d64d);
-    transition:width .7s cubic-bezier(.16,1,.3,1)}
-  .bar .val{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);
-    font-variant-numeric:tabular-nums}
+  /* bars: a thin fill, no track boxes, no gradients */
+  .bars{display:flex;flex-direction:column;gap:11px}
+  .bar{display:grid;grid-template-columns:132px 1fr auto;align-items:center;gap:16px}
+  .bar .name{font-size:13.5px;font-weight:500;text-align:right;letter-spacing:-.01em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar .track{height:6px;background:var(--surface);border-radius:999px;overflow:hidden}
+  .bar .fill{display:block;height:100%;background:var(--ink);border-radius:999px;
+    transition:width .6s cubic-bezier(.16,1,.3,1)}
+  .bar .fill.alt{background:#c3c3ca}
+  .bar .val{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--faint);
+    font-variant-numeric:tabular-nums;white-space:nowrap}
   .bar .val b{color:var(--ink);font-weight:500}
 
-  /* flow: plain text, arrows between, no boxes */
-  .flow{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;
-    font-family:'JetBrains Mono',monospace;font-size:14px}
-  .flow .step{color:var(--ink);font-weight:500}
-  .flow .step span{color:var(--accent)}
-  .flow .arrow{color:#4a453c}
-  .flow-note{margin-top:22px;font-size:14px;color:var(--muted);max-width:62ch;line-height:1.6}
-  .flow-note b{color:var(--ink);font-weight:600}
+  /* donut: monochrome ramp, one accent only for the largest slice */
+  .donut{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+  .legend{display:flex;flex-direction:column;gap:7px;font-size:13px;min-width:200px}
+  .legend div{display:flex;align-items:center;gap:9px;color:var(--muted);
+    letter-spacing:-.01em}
+  .legend .dot{width:8px;height:8px;border-radius:3px;flex:none}
+  .legend .ct{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+    color:var(--faint);font-variant-numeric:tabular-nums}
 
-  .split{display:grid;grid-template-columns:1fr 1fr;gap:64px}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:52px}
 
-  /* donut + legend, no box */
-  .donut{display:flex;align-items:center;gap:30px}
-  .donut svg{flex-shrink:0}
-  .legend{display:flex;flex-direction:column;gap:11px;font-size:13.5px;flex:1}
-  .legend div{display:flex;align-items:center;gap:10px}
-  .legend .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-  .legend .ct{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12.5px;
-    color:var(--muted);font-variant-numeric:tabular-nums}
+  /* tabs: pills, one active in near-black */
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px}
+  .tab{font-family:inherit;font-size:12.5px;font-weight:500;letter-spacing:-.01em;
+    padding:7px 14px;border-radius:999px;border:1px solid var(--border);
+    background:var(--bg);color:var(--muted);cursor:pointer;transition:.15s}
+  .tab:hover{border-color:#d4d4d9;color:var(--ink)}
+  .tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
 
-  /* tabs: plain text toggles, no pills */
-  .tabs{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:30px}
-  .tab{font-size:13.5px;font-weight:500;color:var(--muted);background:none;border:none;
-    cursor:pointer;padding:0 0 4px;border-bottom:2px solid transparent;transition:.15s}
-  .tab:hover{color:var(--ink)}
-  .tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+  /* pairs: a quiet table of co-occurrence */
+  .pairs{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .pair{display:flex;align-items:baseline;gap:8px;font-size:13px;padding:5px 0;
+    border-bottom:1px solid var(--border)}
+  .pair:last-child{border-bottom:0}
+  .pair b{font-weight:500;letter-spacing:-.01em}
+  .pair .c{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+    color:var(--faint);font-variant-numeric:tabular-nums}
 
-  /* pairs: plain columns */
-  .pairs{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
-  .pairs h3{font-size:14px;font-weight:700;margin-bottom:16px}
-  .pairs h3 span{color:var(--accent)}
-  .pair{display:flex;justify-content:space-between;font-size:13.5px;
-    padding:5px 0;color:var(--muted)}
-  .pair b{color:var(--ink);font-weight:500}
-  .pair .c{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
-
-  /* how it works: the method, not the code */
-  .how ol{list-style:none;counter-reset:step;max-width:72ch}
-  .how li{counter-increment:step;position:relative;padding-left:42px;margin-bottom:18px;
-    font-size:14.5px;color:var(--muted);line-height:1.65}
-  .how li::before{content:counter(step);position:absolute;left:0;top:1px;
-    font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--accent);
-    border:1px solid #2e2a24;border-radius:999px;width:24px;height:24px;
+  /* how it works: numbered, no boxes */
+  .how ol{list-style:none;counter-reset:step}
+  .how li{counter-increment:step;position:relative;padding-left:36px;margin-bottom:16px;
+    color:var(--muted);line-height:1.65;max-width:68ch}
+  .how li::before{content:counter(step);position:absolute;left:0;top:0;
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);
+    width:22px;height:22px;border-radius:7px;background:var(--surface);
     display:flex;align-items:center;justify-content:center}
   .how li b{color:var(--ink);font-weight:600}
-  .how .mono{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#c9c4ba}
-  .from-to{display:grid;grid-template-columns:1fr 16px 1fr 16px 1fr;gap:8px;
-    align-items:start;margin-top:36px}
-  .from-to .lbl{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;
-    letter-spacing:.12em;text-transform:uppercase;color:#5f5a51;margin-bottom:8px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .from-to pre{font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.75;
-    background:#131210;border:1px solid #242220;border-radius:10px;padding:14px 16px;
-    overflow-x:auto;color:#c9c4ba;margin:0}
-  .from-to .arrow{color:#4a453c;font-size:15px;padding-top:44px;text-align:center}
-  .caveat{margin-top:30px;font-size:13.5px;color:#5f5a51;line-height:1.6;max-width:72ch}
-  footer{margin-top:20px;font-size:13px;color:#5f5a51}
-  footer .links{margin-left:10px}
-  footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid #2e2a24;
-    margin-right:14px;padding-bottom:1px;transition:color .15s,border-color .15s}
-  footer a:hover{color:var(--accent);border-color:var(--accent)}
+  .how .mono{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink)}
 
-  @media(max-width:900px){
-    .stats{grid-template-columns:repeat(2,1fr);gap:32px}
-    .split{grid-template-columns:1fr;gap:64px}
-    .pairs{grid-template-columns:1fr;gap:36px}
-    .bar{grid-template-columns:110px 1fr 96px;gap:12px}
-    .from-to{grid-template-columns:1fr;gap:10px}
-    .from-to .arrow{display:none}
+  .trace{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;
+    align-items:start;margin-top:32px}
+  .trace .lbl{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:7px}
+  .trace pre{font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.8;
+    background:var(--surface);border-radius:12px;padding:14px 15px;overflow-x:auto;
+    color:var(--ink);margin:0}
+  .trace .arrow{color:#d4d4d9;font-size:14px;padding-top:42px;text-align:center}
+  .caveat{margin-top:26px;font-size:13px;color:var(--faint);line-height:1.65;max-width:68ch}
+
+  footer{padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;
+    color:var(--faint);display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline}
+  footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--border)}
+  footer a:hover{color:var(--ink);border-color:var(--ink)}
+
+  @media(max-width:820px){
+    .wrap{padding:40px 20px 64px}
+    h1{font-size:1.6rem}
+    .split{grid-template-columns:1fr;gap:44px}
+    .pairs{grid-template-columns:1fr 1fr;gap:20px}
+    .trace{grid-template-columns:1fr;gap:8px}
+    .trace .arrow{display:none}
+    .bar{grid-template-columns:104px 1fr auto;gap:12px}
+  }
+  @media(max-width:520px){
+    .pairs{grid-template-columns:1fr}
+    .bar{grid-template-columns:92px 1fr auto}
+    .donut{gap:20px}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Which skills are the job market actually asking for?</h1>
-  <p class="sub">An end-to-end data platform that collects job postings, models them
-    in a dbt-managed warehouse, and answers that question with SQL.</p>
 
-  <p class="prov" id="prov"></p>
-
-  <div class="stats" id="stats"></div>
-
-  <section>
-    <h2>Pipeline and orchestration</h2>
-    <div class="flow">
-      <span class="step">collect<span>.py</span></span>
-      <span class="arrow">→</span>
-      <span class="step">transform<span>.py</span></span>
-      <span class="arrow">→</span>
-      <span class="step">load<span>.py</span></span>
-      <span class="arrow">→</span>
-      <span class="step">dbt</span>
-      <span class="arrow">→</span>
-      <span class="step">analyze<span>.py</span></span>
-    </div>
-    <p class="flow-note">Scheduled daily by an <b>Apache Airflow</b> DAG. The dbt layer models
-      the warehouse and enforces <b>27 data-quality tests</b>, all passing.</p>
-  </section>
+  <header>
+    <h1>Which skills the job market is actually asking for</h1>
+    <p class="sub">A pipeline that collects job postings, models them in a dbt
+      warehouse, and answers that question with SQL.</p>
+    <p class="prov" id="prov"></p>
+  </header>
 
   <section>
-    <h2>How it works</h2>
+    <h2>Pipeline</h2>
     <div class="how">
       <ol>
         <li><b>Collect.</b> Walks the Arbeitnow job board API page by page — 300
@@ -163,53 +147,50 @@
           pairs into DuckDB, with a SQLite mirror. Rebuilt from scratch every run,
           so the result is always a clean function of the input.</li>
         <li><b>Model.</b> Five dbt models turn the raw tables into marts —
-          <span class="mono">skill_demand</span>, <span class="mono">role_families</span>,
-          <span class="mono">seniority_mix</span>, <span class="mono">top_skills_by_family</span>.
-          27 data-quality tests run alongside them: uniqueness of ids, accepted
-          role and seniority values, and a share-of-market column that must stay
-          between 0 and 100%.</li>
+          <span class="mono">skill_demand</span>,
+          <span class="mono">role_families</span>,
+          <span class="mono">seniority_mix</span>,
+          <span class="mono">top_skills_by_family</span>. 27 data-quality tests run
+          alongside them: uniqueness of ids, accepted role and seniority values,
+          and a share-of-market column that must stay between 0 and 100%.</li>
         <li><b>Analyse.</b> The marts are queried into a single
-          <span class="mono">metrics.json</span> that the page reads. No chart
-          library — the donut and bars are computed in plain SVG.</li>
+          <span class="mono">metrics.json</span> that this page reads. No chart
+          library — the donut and the bars are computed in plain SVG.</li>
       </ol>
+    </div>
 
-      <div class="from-to">
-        <div>
-          <span class="lbl">raw posting</span>
-          <pre>{ "title": "Senior Data Engineer",
+    <div class="trace">
+      <div>
+        <span class="lbl">raw posting</span>
+        <pre>{ "title": "Senior Data Engineer",
   "company_name": "Acme",
-  "description": "&lt;p&gt;We use &lt;b&gt;Python&lt;/b&gt;&lt;/p&gt;",
+  "description": "&lt;p&gt;Python&lt;/p&gt;",
   "tags": ["Engineering"],
   "remote": false }</pre>
-        </div>
-        <div class="arrow">→</div>
-        <div>
-          <span class="lbl">one row + skill pairs</span>
-          <pre>title      Senior Data Engineer
+      </div>
+      <div class="arrow">→</div>
+      <div>
+        <span class="lbl">row + skill pairs</span>
+        <pre>title      Senior Data Engineer
 category   Data
 seniority  Senior
 
 skill
-----------------
+--------------
 Python</pre>
-        </div>
-        <div class="arrow">→</div>
-        <div>
-          <span class="lbl">query result</span>
-          <pre>skill    postings  pct
-------------------------
+      </div>
+      <div class="arrow">→</div>
+      <div>
+        <span class="lbl">query result</span>
+        <pre>skill    postings  pct
+---------------------
 Python      399   15.3
 CI/CD       222    8.5
 SQL         215    8.3</pre>
-        </div>
       </div>
-
-      <p class="caveat">A skill count is a count of postings that <i>mention</i>
-        it, not a share of the market — and the share above ("jobs yielding a
-        skill") is the fraction of this corpus that produced one at all. The
-        source is a general job board rather than a tech-only one, so that
-        fraction is well under half.</p>
     </div>
+
+    <p class="caveat" id="caveat"></p>
   </section>
 
   <section>
@@ -240,101 +221,92 @@ SQL         215    8.3</pre>
   </section>
 
   <footer>
-    Job Market Analyzer. Portfolio project by Duta Alamin.
-    <span class="links">
-      <a href="https://github.com/dutaalamin/job-market-analyzer">source on GitHub</a>
-      <a href="https://github.com/dutaalamin/job-market-analyzer/blob/main/tests/test_transform.py">tests</a>
-    </span>
+    <span>Job Market Analyzer — portfolio project by Duta Alamin.</span>
+    <a href="https://github.com/dutaalamin/job-market-analyzer">source</a>
+    <a href="https://github.com/dutaalamin/job-market-analyzer/blob/main/tests/test_transform.py">tests</a>
   </footer>
 </div>
 
 <script>
-const PALETTE = ['#e2b714','#5ea9ff','#8b7cf6','#ff7f50','#00b894','#ff6b9f','#f5d24a','#6699cc','#e84393','#6ab04c'];
+// A monochrome ramp. Eleven role families in eleven hues reads as decoration;
+// a single ramp reads as one ranked series, which is what this is.
+const RAMP = ['#111114','#2a2a31','#44444d','#5e5e68','#787882','#92929b',
+              '#aaaab2','#c0c0c7'];
 
 async function load() {
   const res = await fetch('./data/metrics.json');
   const d = await res.json();
   const t = d.totals;
 
-  // Provenance from the payload, not hardcoded: if the snapshot ages, this line
-  // ages with it.
-  if (t.source) {
-    const when = t.snapshot
-      ? t.snapshot.slice(0, 4) + '-' + t.snapshot.slice(4, 6) + '-' + t.snapshot.slice(6, 8)
-      : "";
-    document.getElementById('prov').innerHTML =
-      `source <b><a href="${t.source_url}">${t.source}</a></b>`
-      + ` · <b>${t.jobs.toLocaleString()}</b> postings`
-      + ` · <b>${t.companies.toLocaleString()}</b> companies`
-      + (when ? ` · snapshot <b>${when}</b>` : "");
-  }
-
-  // Stats
-  //
-  // Jobs and companies used to be two of these four cards, but the provenance
-  // line above now carries both — printing 2,604 and 1,012 twice within 100px
-  // told the reader nothing. What remains either adds a fact or sets a bound:
-  // "skill mentions" is the total behind the bars, "skills per posting" says how
-  // concentrated the extraction is, and coverage is the caveat that keeps the
-  // ranking honest.
-  const perJob = t.jobs_with_skills ? t.skill_mentions / t.jobs_with_skills : 0;
   const coverage = t.jobs ? Math.round(t.jobs_with_skills / t.jobs * 100) : 0;
+  const perJob = t.jobs_with_skills ? t.skill_mentions / t.jobs_with_skills : 0;
 
-  document.getElementById('stats').innerHTML = [
-    ['Skill mentions', t.skill_mentions.toLocaleString()],
-    ['Skills per posting', perJob.toFixed(1)],
-    ['Role families', t.categories],
-    ['Jobs yielding a skill', `${coverage}%`],
-  ].map(([l, n]) =>
-    `<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`
-  ).join('');
+  // Provenance and the coverage caveat come from the payload, so neither can
+  // drift from the numbers it qualifies. No figure is written twice: postings
+  // and companies live here, and nowhere else on the page.
+  const when = t.snapshot
+    ? `${t.snapshot.slice(0,4)}-${t.snapshot.slice(4,6)}-${t.snapshot.slice(6,8)}`
+    : '';
 
-  // Skills
+  document.getElementById('prov').innerHTML =
+    `source <b>${t.source_url ? `<a href="${t.source_url}">${t.source}</a>` : t.source}</b>`
+    + ` · <b>${t.jobs.toLocaleString()}</b> postings`
+    + ` · <b>${t.companies.toLocaleString()}</b> companies`
+    + (when ? ` · snapshot <b>${when}</b>` : '');
+
+  document.getElementById('caveat').innerHTML =
+    `A skill count is a count of postings that <em>mention</em> it, not a share of
+     the market. ${coverage}% of this corpus yields any skill at all
+     (${t.jobs_with_skills.toLocaleString()} postings, ${perJob.toFixed(1)} skills
+     each on average) — the source is a general job board rather than a
+     tech-only one.`;
+
   const maxSkill = d.topSkills[0]?.postings || 1;
-  document.getElementById('skills').innerHTML = d.topSkills.slice(0,15).map(s => `
+  document.getElementById('skills').innerHTML = d.topSkills.slice(0, 15).map(s => `
     <div class="bar">
       <span class="name">${s.skill}</span>
       <span class="track"><span class="fill" style="width:${(s.postings/maxSkill*100).toFixed(1)}%"></span></span>
       <span class="val"><b>${s.postings}</b>${s.pct_of_jobs != null ? ` · ${s.pct_of_jobs}%` : ''}</span>
     </div>`).join('');
 
-  // Donut
-  const cats = d.categories.filter(c => c.postings > 0);
-  const total = cats.reduce((a,c) => a + c.postings, 0);
-  const top = cats.slice(0, 7);
+  const all = d.categories.filter(c => c.postings > 0);
+  const TOP_N = 6;
+  const cats = all.slice(0, TOP_N);
+  const tail = all.slice(TOP_N).reduce((a, c) => a + c.postings, 0);
+  if (tail) cats.push({ role_family: 'Rest', postings: tail });
+  const total = cats.reduce((a, c) => a + c.postings, 0);
   let acc = 0;
-  const R = 60, C = 2*Math.PI*R;
-  const arcs = cats.map((c,i) => {
-    const frac = c.postings/total;
-    const seg = `<circle r="${R}" cx="76" cy="76" fill="none" stroke="${PALETTE[i%PALETTE.length]}"
-      stroke-width="22" stroke-dasharray="${(frac*C).toFixed(2)} ${C}"
+  const R = 62, C = 2 * Math.PI * R;
+  const arcs = cats.map((c, i) => {
+    const frac = c.postings / total;
+    const seg = `<circle r="${R}" cx="76" cy="76" fill="none"
+      stroke="${RAMP[i % RAMP.length]}" stroke-width="20"
+      stroke-dasharray="${(frac*C).toFixed(2)} ${C}"
       stroke-dashoffset="${(-acc*C).toFixed(2)}" transform="rotate(-90 76 76)"/>`;
     acc += frac;
     return seg;
   }).join('');
-  const rest = cats.slice(7).reduce((a,c) => a + c.postings, 0);
+
   document.getElementById('donut').innerHTML = `
-    <svg width="152" height="152" viewBox="0 0 152 152">${arcs}</svg>
+    <svg width="152" height="152" viewBox="0 0 152 152" aria-hidden="true">${arcs}</svg>
     <div class="legend">
-      ${top.map((c,i) => `
-        <div><span class="dot" style="background:${PALETTE[i%PALETTE.length]}"></span>
+      ${cats.map((c, i) => `
+        <div><span class="dot" style="background:${RAMP[i % RAMP.length]}"></span>
         ${c.role_family}<span class="ct">${c.postings}</span></div>`).join('')}
-      ${rest ? `<div><span class="dot" style="background:#3a352c"></span>Other<span class="ct">${rest}</span></div>` : ''}
     </div>`;
 
-  // Seniority
   const maxSen = Math.max(...d.seniority.map(s => s.postings));
   document.getElementById('seniority').innerHTML = d.seniority.map(s => `
     <div class="bar">
       <span class="name">${s.seniority}</span>
-      <span class="track"><span class="fill" style="width:${(s.postings/maxSen*100).toFixed(1)}%;background:linear-gradient(90deg,#5ea9ff,#8b7cf6)"></span></span>
+      <span class="track"><span class="fill alt" style="width:${(s.postings/maxSen*100).toFixed(1)}%"></span></span>
       <span class="val"><b>${s.postings}</b></span>
     </div>`).join('');
 
-  // Tabs
   const names = Object.keys(d.byCategory);
   const tabs = document.getElementById('tabs');
   const bycat = document.getElementById('bycat');
+
   function renderCat(name) {
     const list = d.byCategory[name] || [];
     const mx = list[0]?.postings || 1;
@@ -343,29 +315,33 @@ async function load() {
         <span class="name">${s.skill}</span>
         <span class="track"><span class="fill" style="width:${(s.postings/mx*100).toFixed(1)}%"></span></span>
         <span class="val"><b>${s.postings}</b></span>
-      </div>`).join('') || '<p style="color:var(--muted)">No data</p>';
+      </div>`).join('') || `<p style="color:var(--faint)">No data</p>`;
   }
-  tabs.innerHTML = names.map((n,i) =>
-    `<button class="tab${i===0?' on':''}" data-n="${n}">${n}</button>`).join('');
+
+  tabs.innerHTML = names.map((n, i) =>
+    `<button class="tab${i === 0 ? ' on' : ''}" data-n="${n}">${n}</button>`).join('');
+
   tabs.addEventListener('click', e => {
-    const b = e.target.closest('.tab'); if (!b) return;
+    const b = e.target.closest('.tab');
+    if (!b) return;
     tabs.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
     b.classList.add('on');
     renderCat(b.dataset.n);
   });
   if (names.length) renderCat(names[0]);
 
-  // Pairs
-  document.getElementById('pairs').innerHTML = Object.entries(d.skillPairs).map(([skill, list]) => `
-    <div>
-      <h3>Pairs with <span>${skill}</span></h3>
-      ${list.map(p => `<div class="pair"><b>${p.companion}</b><span class="c">${p.together}</span></div>`).join('')}
-    </div>`).join('');
+  document.getElementById('pairs').innerHTML =
+    Object.entries(d.skillPairs).map(([skill, list]) => `
+      <div>
+        <h3>Pairs with <span>${skill}</span></h3>
+        ${list.map(p => `<div class="pair"><b>${p.companion}</b><span class="c">${p.together}</span></div>`).join('')}
+      </div>`).join('');
 }
 
 load().catch(e => {
-  document.body.innerHTML = '<div style="padding:40px;font-family:monospace;color:#e2b714">'
-    + 'Failed to load metrics.json. Run the pipeline first.<br><br>' + e + '</div>';
+  document.body.innerHTML =
+    '<div style="padding:48px;font-family:ui-monospace,monospace;font-size:13px">'
+    + 'Could not load metrics.json. Run the pipeline first.<br><br>' + e + '</div>';
 });
 </script>
 </body>
