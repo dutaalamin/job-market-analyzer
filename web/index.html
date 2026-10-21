@@ -20,6 +20,11 @@
   h1{font-size:clamp(2.2rem,5.4vw,3.8rem);font-weight:900;letter-spacing:-.035em;
     line-height:1.0;max-width:16ch}
   .sub{margin-top:22px;color:var(--muted);font-size:16px;max-width:56ch;line-height:1.6}
+  .prov{margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+    color:#5f5a51;letter-spacing:.02em}
+  .prov b{color:var(--muted);font-weight:500}
+  .prov a{color:var(--muted);text-decoration:none;border-bottom:1px solid #2e2a24}
+  .prov a:hover{color:var(--accent);border-color:var(--accent)}
 
   /* stat row: no boxes, just big numbers */
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin:64px 0 88px}
@@ -121,6 +126,8 @@
   <h1>Which skills are the job market actually asking for?</h1>
   <p class="sub">An end-to-end data platform that collects job postings, models them
     in a dbt-managed warehouse, and answers that question with SQL.</p>
+
+  <p class="prov" id="prov"></p>
 
   <div class="stats" id="stats"></div>
 
@@ -247,6 +254,19 @@ async function load() {
   const res = await fetch('./data/metrics.json');
   const d = await res.json();
   const t = d.totals;
+
+  // Provenance from the payload, not hardcoded: if the snapshot ages, this line
+  // ages with it.
+  if (t.source) {
+    const when = t.snapshot
+      ? t.snapshot.slice(0, 4) + '-' + t.snapshot.slice(4, 6) + '-' + t.snapshot.slice(6, 8)
+      : "";
+    document.getElementById('prov').innerHTML =
+      `source <b><a href="${t.source_url}">${t.source}</a></b>`
+      + ` · <b>${t.jobs.toLocaleString()}</b> postings`
+      + ` · <b>${t.companies.toLocaleString()}</b> companies`
+      + (when ? ` · snapshot <b>${when}</b>` : "");
+  }
 
   // Stats
   document.getElementById('stats').innerHTML = [

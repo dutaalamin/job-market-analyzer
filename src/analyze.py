@@ -35,6 +35,13 @@ def summarize(connection: duckdb.DuckDBPyConnection) -> dict:
         """,
     )[0]
 
+    # Provenance belongs next to the numbers: a reader cannot judge a figure
+    # without knowing where it came from and how old it is.
+    snapshot = sorted((ROOT / "data" / "raw").glob("jobs-*.json"))
+    totals["source"] = "Arbeitnow job board API"
+    totals["source_url"] = "https://www.arbeitnow.com/api/job-board-api"
+    totals["snapshot"] = snapshot[-1].stem.replace("jobs-", "") if snapshot else ""
+
     top_skills = rows(
         connection,
         "select skill, postings, pct_of_jobs from skill_demand order by postings desc limit 25",
