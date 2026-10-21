@@ -9,3 +9,5 @@ dbt/target/
 dbt/dbt_packages/
 dbt/logs/
 data/warehouse.duckdb
+
+tests/__pycache__/

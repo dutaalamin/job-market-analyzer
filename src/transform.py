@@ -25,11 +25,11 @@ from datetime import datetime, timezone
 SKILL_PATTERNS: list[tuple[str, str]] = [
     ("JavaScript", r"\bjavascript\b"),
     ("TypeScript", r"\btypescript\b"),
-    ("Node.js", r"\bnode(?:\.js|js)?\b"),
-    ("React", r"\breact(?:\.js|js)?\b"),
-    ("Vue", r"\bvue(?:\.js|js)?\b"),
+    ("Node.js", r"\bnode\.?\s?js\b"),
+    ("React", r"\bReact\b|\breact\.?\s?js\b"),
+    ("Vue", r"\bVue\b|\bvue\.?\s?js\b"),
     ("Angular", r"\bangular\b"),
-    ("Next.js", r"\bnext(?:\.js|js)?\b"),
+    ("Next.js", r"\bnext\.?\s?js\b"),
     ("Svelte", r"\bsvelte\b"),
     ("Python", r"\bpython\b"),
     ("Django", r"\bdjango\b"),
@@ -37,17 +37,17 @@ SKILL_PATTERNS: list[tuple[str, str]] = [
     ("FastAPI", r"\bfastapi\b"),
     ("Pandas", r"\bpandas\b"),
     ("NumPy", r"\bnumpy\b"),
-    ("Java", r"\bjava\b"),
+    ("Java", r"\bJava\b"),
     ("Kotlin", r"\bkotlin\b"),
     ("Scala", r"\bscala\b"),
     ("Golang", r"\bgolang\b"),
-    ("Rust", r"\brust\b"),
+    ("Rust", r"\bRust\b"),
     ("Ruby", r"\bruby\b"),
     ("PHP", r"\bphp\b"),
     ("Laravel", r"\blaravel\b"),
     ("C#", r"\bc#"),
     ("C++", r"\bc\+\+"),
-    ("Swift", r"\bswift\b"),
+    ("Swift", r"\bSwift\b"),
     ("SQL", r"\bsql\b"),
     ("PostgreSQL", r"\bpostgres(?:ql)?\b"),
     ("MySQL", r"\bmysql\b"),
@@ -59,7 +59,7 @@ SKILL_PATTERNS: list[tuple[str, str]] = [
     ("Redshift", r"\bredshift\b"),
     ("Airflow", r"\bairflow\b"),
     ("dbt", r"\bdbt\b"),
-    ("Spark", r"\bspark\b"),
+    ("Spark", r"\bSpark\b|\bapache\s+spark\b|\bpyspark\b"),
     ("Kafka", r"\bkafka\b"),
     ("ETL", r"\betl\b"),
     ("Docker", r"\bdocker\b"),
@@ -72,7 +72,7 @@ SKILL_PATTERNS: list[tuple[str, str]] = [
     ("Git", r"\bgit\b"),
     ("Linux", r"\blinux\b"),
     ("GraphQL", r"\bgraphql\b"),
-    ("REST", r"\brest\b|\brestful\b"),
+    ("REST", r"\bREST(?:ful)?\b|\brest\s*(?:api|apis|endpoint|endpoints)\b"),
     ("HTML", r"\bhtml\b"),
     ("CSS", r"\bcss\b"),
     ("Tailwind", r"\btailwind\b"),
@@ -82,7 +82,16 @@ SKILL_PATTERNS: list[tuple[str, str]] = [
     ("Figma", r"\bfigma\b"),
 ]
 
-_COMPILED = [(name, re.compile(pattern)) for name, pattern in SKILL_PATTERNS]
+# Skills whose name is also an ordinary word are matched case-sensitively:
+# "Rust" the language is capitalised in 41 postings and lowercase in 11 (where it
+# means corrosion), and "React" appears capitalised 111 times against 1 verb use.
+# Everything else stays case-insensitive so "python" and "Python" both count.
+CASE_SENSITIVE = {"React", "Swift", "Rust", "Spark", "REST"}
+
+_COMPILED = [
+    (name, re.compile(pattern, 0 if name in CASE_SENSITIVE else re.IGNORECASE))
+    for name, pattern in SKILL_PATTERNS
+]
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"\s+")
@@ -97,11 +106,11 @@ _SENIORITY_RULES: list[tuple[str, str]] = [
 
 _CATEGORY_RULES: list[tuple[str, str]] = [
     ("Data", r"\bdata\b|\banalyst\b|\banalytics\b|\bbi\b|\bmachine learning\b|\bml\b|\bai\b|\bscientist\b"),
-    ("Engineering", r"\bengineer\b|\bdeveloper\b|\bprogrammer\b|\bsoftware\b|\bdevops\b|\bfrontend\b|\bbackend\b|\bfull[- ]?stack\b|\barchitect\b"),
+    ("Engineering", r"\bengineer\b|\bdeveloper\b|\bprogrammer\b|\bsoftware\b|\bdevops\b|\bfrontend\b|\bbackend\b|\bfull[- ]?stack\b|\barchitect\b|\bentwickler\b"),
     ("Design", r"\bdesigner\b|\bdesign\b|\bux\b|\bui\b|\bproduct design\b"),
     ("Product", r"\bproduct manager\b|\bproduct owner\b|\bproduct\b"),
     ("Marketing", r"\bmarketing\b|\bseo\b|\bcontent\b|\bsocial media\b|\bgrowth\b|\bbrand\b"),
-    ("Sales", r"\bsales\b|\baccount manager\b|\bbusiness development\b|\bsdr\b"),
+    ("Sales", r"\bsales\b|\baccount (?:manager|executive)\b|\bbusiness development\b|\bsdr\b|vertrieb|\bkey account\b"),
     ("Finance", r"\bfinance\b|\baccountant\b|\baccounting\b|\bcontroller\b|\bpayroll\b"),
     ("Support", r"\bsupport\b|\bcustomer service\b|\bhelpdesk\b|\bcustomer success\b"),
     ("Operations", r"\boperations\b|\blogistics\b|\bsupply chain\b|\bprocurement\b"),
@@ -122,7 +131,8 @@ def strip_html(value: str) -> str:
 
 def extract_skills(*texts: str) -> list[str]:
     """Return the skills mentioned across the given texts, de-duplicated."""
-    haystack = " ".join(texts).lower()
+    # Original casing on purpose — see CASE_SENSITIVE.
+    haystack = " ".join(text for text in texts if text)
     found: list[str] = []
     for name, pattern in _COMPILED:
         if pattern.search(haystack) and name not in found:

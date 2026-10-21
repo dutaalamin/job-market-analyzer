@@ -74,6 +74,18 @@ models/
 accepted-value checks on `category` and `seniority`, plus a singular test
 asserting share-of-market stays within 0–100%.
 
+## Test
+
+```bash
+python -m unittest discover -s tests -v   # transform rules
+dbt build --profiles-dir dbt              # models + 27 data-quality tests
+```
+
+`tests/test_transform.py` pins the disambiguation rules that shipped broken:
+skills were matched against a lowercased haystack, so the English word "next"
+matched the Next.js pattern and Next.js appeared as the most in-demand skill
+(501 postings) when only 16 postings actually mention it.
+
 ## Layout
 
 ```
@@ -93,6 +105,8 @@ queries/         standalone SQL used before the dbt layer
 data/
   raw/           raw API snapshots (JSON)
   warehouse.duckdb
+tests/
+  test_transform.py   regression tests for the transform rules
 web/
   index.html     dashboard
   data/          exported metrics
