@@ -156,8 +156,8 @@
     <h2>How it works</h2>
     <div class="how">
       <ol>
-        <li><b>Collect.</b> Walks the Arbeitnow job board API page by page — 300
-          postings each, up to 3,000 — and writes the raw JSON to disk before
+        <li><b>Collect.</b> Walks the Arbeitnow job board API page by page, 300
+          postings each, up to 3,000, and writes the raw JSON to disk before
           touching it. Re-runs read that snapshot, so the transform can be
           changed without hitting the network again.</li>
         <li><b>Transform.</b> Strips double-escaped HTML, derives a role family
@@ -166,7 +166,7 @@
         <li><b>Load.</b> Writes one table of postings and one of (posting, skill)
           pairs into DuckDB, with a SQLite mirror. Rebuilt from scratch every run,
           so the result is always a clean function of the input.</li>
-        <li><b>Model.</b> Five dbt models turn the raw tables into marts —
+        <li><b>Model.</b> Five dbt models turn the raw tables into marts:
           <span class="mono">skill_demand</span>, <span class="mono">role_families</span>,
           <span class="mono">seniority_mix</span>, <span class="mono">top_skills_by_family</span>.
           27 data-quality tests run alongside them: uniqueness of ids, accepted
@@ -174,7 +174,7 @@
           between 0 and 100%.</li>
         <li><b>Analyse.</b> The marts are queried into a single
           <span class="mono">metrics.json</span> that the page reads. No chart
-          library — the donut and bars are computed in plain SVG.</li>
+          library: the donut and bars are computed in plain SVG.</li>
       </ol>
 
       <div class="from-to">
@@ -209,7 +209,7 @@ SQL         215    8.3</pre>
       </div>
 
       <p class="caveat">A skill count is a count of postings that <i>mention</i>
-        it, not a share of the market — and the share above ("jobs yielding a
+        it, not a share of the market. The share above ("jobs yielding a
         skill") is the fraction of this corpus that produced one at all. The
         source is a general job board rather than a tech-only one, so that
         fraction is well under half.</p>
@@ -276,7 +276,7 @@ async function load() {
   // Stats
   //
   // Jobs and companies used to be two of these four cards, but the provenance
-  // line above now carries both — printing 2,604 and 1,012 twice within 100px
+  // line above now carries both, so printing 2,604 and 1,012 twice within 100px
   // told the reader nothing. What remains either adds a fact or sets a bound:
   // "skill mentions" is the total behind the bars, "skills per posting" says how
   // concentrated the extraction is, and coverage is the caveat that keeps the
