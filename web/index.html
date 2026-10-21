@@ -205,9 +205,10 @@ SQL         215    8.3</pre>
       </div>
 
       <p class="caveat">A skill count is a count of postings that <i>mention</i>
-        it, not a share of the market — and 36% of this corpus yields any skill
-        at all, because the source is a general job board rather than a
-        tech-only one.</p>
+        it, not a share of the market — and the share above ("jobs yielding a
+        skill") is the fraction of this corpus that produced one at all. The
+        source is a general job board rather than a tech-only one, so that
+        fraction is well under half.</p>
     </div>
   </section>
 
@@ -269,13 +270,23 @@ async function load() {
   }
 
   // Stats
+  //
+  // Jobs and companies used to be two of these four cards, but the provenance
+  // line above now carries both — printing 2,604 and 1,012 twice within 100px
+  // told the reader nothing. What remains either adds a fact or sets a bound:
+  // "skill mentions" is the total behind the bars, "skills per posting" says how
+  // concentrated the extraction is, and coverage is the caveat that keeps the
+  // ranking honest.
+  const perJob = t.jobs_with_skills ? t.skill_mentions / t.jobs_with_skills : 0;
+  const coverage = t.jobs ? Math.round(t.jobs_with_skills / t.jobs * 100) : 0;
+
   document.getElementById('stats').innerHTML = [
-    ['Jobs analysed', t.jobs],
-    ['Companies', t.companies],
-    ['Skill mentions', t.skill_mentions],
+    ['Skill mentions', t.skill_mentions.toLocaleString()],
+    ['Skills per posting', perJob.toFixed(1)],
     ['Role families', t.categories],
-  ].map(([l,n]) =>
-    `<div class="stat"><div class="n">${n.toLocaleString()}</div><div class="l">${l}</div></div>`
+    ['Jobs yielding a skill', `${coverage}%`],
+  ].map(([l, n]) =>
+    `<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`
   ).join('');
 
   // Skills

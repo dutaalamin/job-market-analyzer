@@ -31,7 +31,10 @@ def summarize(connection: duckdb.DuckDBPyConnection) -> dict:
             (select count(*) from stg_jobs)                    as jobs,
             (select count(distinct company) from stg_jobs)     as companies,
             (select count(*) from job_skills)                  as skill_mentions,
-            (select count(distinct category) from stg_jobs)    as categories
+            (select count(distinct category) from stg_jobs)    as categories,
+            -- Coverage is the honest counterweight to every skill number on the
+            -- page: only these postings yielded a skill at all.
+            (select count(distinct external_id) from job_skills) as jobs_with_skills
         """,
     )[0]
 

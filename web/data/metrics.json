@@ -4,6 +4,7 @@
     "companies": 1012,
     "skill_mentions": 3730,
     "categories": 11,
+    "jobs_with_skills": 960,
     "source": "Arbeitnow job board API",
     "source_url": "https://www.arbeitnow.com/api/job-board-api",
     "snapshot": "20261016-121853"
@@ -706,11 +707,11 @@
         "together": 28
       },
       {
-        "companion": "Docker",
+        "companion": "REST",
         "together": 27
       },
       {
-        "companion": "REST",
+        "companion": "Docker",
         "together": 27
       }
     ]
