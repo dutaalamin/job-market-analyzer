@@ -80,7 +80,21 @@
   .pair b{color:var(--ink);font-weight:500}
   .pair .c{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
 
+  /* engineering note: one short snippet, not a code dump */
+  .note{margin-top:26px;border-left:2px solid var(--accent);padding-left:20px;max-width:74ch}
+  .note p{font-size:14.5px;color:var(--muted);line-height:1.65;margin-bottom:14px}
+  .note p b{color:var(--ink);font-weight:600}
+  .snippet{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.75;
+    background:#131210;border:1px solid #242220;border-radius:10px;padding:16px 18px;
+    overflow-x:auto;color:#c9c4ba}
+  .snippet .del{color:#e06c75;display:block}
+  .snippet .add{color:#98c379;display:block}
+  .snippet .cmt{color:#5f5a51}
   footer{margin-top:20px;font-size:13px;color:#5f5a51}
+  footer .links{margin-left:10px}
+  footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid #2e2a24;
+    margin-right:14px;padding-bottom:1px;transition:color .15s,border-color .15s}
+  footer a:hover{color:var(--accent);border-color:var(--accent)}
 
   @media(max-width:900px){
     .stats{grid-template-columns:repeat(2,1fr);gap:32px}
@@ -116,6 +130,27 @@
   </section>
 
   <section>
+    <h2>Engineering note</h2>
+    <div class="note">
+      <p>The first version of this pipeline matched skills against a lowercased
+        string. That made the English word <b>“next”</b> hit the Next.js pattern —
+        and Next.js appeared as the single most in-demand skill with 501 postings,
+        when only <b>16</b> postings actually mention it. One line, found by
+        reading the output instead of trusting it.</p>
+      <div class="snippet"><span class="cmt"># before — every “next week” became a skill</span>
+<span class="del">- haystack = " ".join(texts).lower()</span>
+<span class="del">- ("Next.js", r"\bnext(?:\.js|js)?\b")</span>
+<span class="cmt"># after — ambiguous names keep their case, and need the “js”</span>
+<span class="add">+ haystack = " ".join(text for text in texts if text)</span>
+<span class="add">+ ("Next.js", r"\bnext\.?\s?js\b")</span></div>
+      <p>Covered by <b>21 regression tests</b>, including every disambiguation that
+        shipped wrong. The dashboard reports how much of the corpus yields a skill
+        at all — a skill count is a count of postings that <i>mention</i> it, not a
+        share of the market.</p>
+    </div>
+  </section>
+
+  <section>
     <h2>Most in-demand skills</h2>
     <div class="bars" id="skills"></div>
   </section>
@@ -142,7 +177,13 @@
     <div class="pairs" id="pairs"></div>
   </section>
 
-  <footer>Job Market Analyzer. Portfolio project by Duta Alamin.</footer>
+  <footer>
+    Job Market Analyzer. Portfolio project by Duta Alamin.
+    <span class="links">
+      <a href="https://github.com/dutaalamin/job-market-analyzer">source on GitHub</a>
+      <a href="https://github.com/dutaalamin/job-market-analyzer/blob/main/tests/test_transform.py">tests</a>
+    </span>
+  </footer>
 </div>
 
 <script>
