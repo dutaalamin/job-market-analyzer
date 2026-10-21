@@ -1,0 +1,35 @@
+-- skill_trend.sql — DRAFT, not wired into dbt on purpose.
+--
+-- Lives outside dbt/models so `dbt build` keeps passing while this is unfinished.
+-- Move it to dbt/models/marts/ once the history exists and the query is written.
+--
+-- WHY THIS IS STILL EMPTY
+-- A trend needs two points in time. Right now the data has one:
+--   * every posting was published between 2026-10-09 and 2026-10-16
+--   * the two raw snapshots were taken on the same day, six hours apart
+--   * load.py deletes warehouse.duckdb on every run, so nothing accumulates
+--
+-- PREREQUISITE (do these first)
+--   1. load.py must rebuild from every file in data/raw/, not just the latest,
+--      and raw_jobs needs a snapshot_at column.
+--   2. stg_jobs must expose snapshot_at.
+--   3. A daily collector has to run for at least two weeks.
+--
+-- CONTRACT FOR THIS MODEL
+--   skill                VARCHAR   skill name
+--   postings_now         BIGINT    postings in the latest snapshot
+--   postings_prev        BIGINT    postings in the snapshot 7 days earlier
+--   pct_now              DOUBLE    share of postings, latest
+--   pct_prev             DOUBLE    share of postings, previous
+--   change_pp            DOUBLE    pct_now - pct_prev, in percentage points
+--   One row per skill. Skills absent from the previous snapshot get
+--   postings_prev = 0 rather than being dropped, otherwise "new" skills vanish.
+--
+-- HINT
+-- DuckDB supports window functions:
+--   row_number() over (partition by skill order by snapshot_at desc) as rn
+-- Keep the two most recent distinct snapshot_at values, then pivot them with
+-- conditional aggregation (max(case when rn = 1 then ... end)).
+--
+-- Write the query below this line.
+

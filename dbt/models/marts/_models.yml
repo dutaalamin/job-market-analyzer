@@ -25,6 +25,19 @@ models:
           - accepted_values:
               values: ['Principal', 'Staff', 'Lead', 'Senior', 'Mid', 'Junior']
 
+  - name: stg_job_history
+    description: >
+      One row per (posting, snapshot). Feeds anything that measures change;
+      stg_jobs stays pinned to the newest snapshot for everything that measures
+      the present.
+    columns:
+      - name: snapshot_at
+        tests: [not_null]
+      - name: external_id
+        tests: [not_null]
+      - name: title
+        tests: [not_null]
+
   - name: job_skills
     description: Exploded (job, skill) pairs.
     columns:

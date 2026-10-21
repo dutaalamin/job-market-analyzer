@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 data/raw/*.json
 data/jobs.db
+!data/skill_history.csv
 .vercel
 
 # dbt

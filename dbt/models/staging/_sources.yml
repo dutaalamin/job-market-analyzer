@@ -8,9 +8,16 @@ sources:
       - name: raw_jobs
         description: One row per collected job posting, with skills as a list.
         columns:
+          - name: snapshot_at
+            description: Collector timestamp (YYYYMMDD-HHMMSS), one per import run.
+            tests: [not_null]
           - name: external_id
-            description: Stable id from the source (slug or url).
-            tests: [not_null, unique]
+            description: >
+              Stable id from the source (slug or url). Not unique on its own:
+              this table keeps one row per (posting, snapshot) so trends are
+              possible. Uniqueness of the pair is asserted by
+              tests/unique_posting_per_snapshot.sql.
+            tests: [not_null]
           - name: title
             tests: [not_null]
           - name: company

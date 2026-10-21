@@ -6,11 +6,19 @@ Two outputs on purpose:
                           without any extra dependency
 
 Rebuilds from scratch each run so the result is a clean function of the input.
+
+The warehouse keeps every snapshot it is given, tagged with `snapshot_at`. A
+trend needs two points in time and a single latest snapshot has exactly one, so
+the loader accepts a list rather than a single batch. Rebuilding from the raw
+files (instead of appending) keeps the run idempotent: the same set of snapshots
+always produces the same warehouse.
 """
 
 from __future__ import annotations
 
+import json
 import sqlite3
+import tempfile
 from pathlib import Path
 
 import duckdb
@@ -37,7 +45,12 @@ def _rows(records: list[dict]):
 # DuckDB warehouse — read by the dbt models
 # --------------------------------------------------------------------------- #
 
-def load_duckdb(records: list[dict]) -> int:
+def load_duckdb(snapshots: list[tuple[str, list[dict]]]) -> int:
+    """Write one row per (posting, snapshot) into the warehouse.
+
+    `snapshots` is a list of (snapshot_at, records). One entry is a normal run;
+    several entries build the history a trend needs.
+    """
     DUCKDB_PATH.parent.mkdir(parents=True, exist_ok=True)
     if DUCKDB_PATH.exists():
         DUCKDB_PATH.unlink()
@@ -46,6 +59,7 @@ def load_duckdb(records: list[dict]) -> int:
     try:
         connection.execute("""
             CREATE TABLE raw_jobs (
+                snapshot_at VARCHAR,
                 external_id VARCHAR,
                 title       VARCHAR,
                 company     VARCHAR,
@@ -60,17 +74,40 @@ def load_duckdb(records: list[dict]) -> int:
             )
         """)
 
-        columns = ", ".join(JOB_COLUMNS) + ", skills"
-        placeholders = ", ".join("?" for _ in JOB_COLUMNS) + ", ?"
-        connection.executemany(
-            f"INSERT INTO raw_jobs ({columns}) VALUES ({placeholders})",
-            list(_rows(records)),
-        )
+        columns = ["snapshot_at", *JOB_COLUMNS, "skills"]
+
+        # A temp NDJSON file plus COPY, not executemany. DuckDB's executemany
+        # issues one statement per row: a few thousand postings took minutes and
+        # an interrupted run left the table half written. COPY reads the whole
+        # batch in one vectorised pass and is atomic.
+        with tempfile.TemporaryDirectory() as tmp:
+            staged = Path(tmp) / "rows.ndjson"
+            with staged.open("w", encoding="utf-8") as handle:
+                for snapshot_at, records in snapshots:
+                    for row in _rows(records):
+                        handle.write(
+                            json.dumps(
+                                dict(zip(columns, [snapshot_at, *row])),
+                                ensure_ascii=False,
+                            )
+                            + "\n"
+                        )
+            connection.execute(
+                f"COPY raw_jobs ({', '.join(columns)}) "
+                f"FROM '{staged.as_posix()}' (FORMAT JSON, ARRAY false)"
+            )
+
         count = connection.execute("SELECT COUNT(*) FROM raw_jobs").fetchone()[0]
+        distinct = connection.execute(
+            "SELECT COUNT(DISTINCT snapshot_at) FROM raw_jobs"
+        ).fetchone()[0]
     finally:
         connection.close()
 
-    print(f"[load] {count} jobs -> {DUCKDB_PATH.name} (warehouse)")
+    print(
+        f"[load] {count} rows across {distinct} snapshot(s) -> "
+        f"{DUCKDB_PATH.name} (warehouse)"
+    )
     return count
 
 
@@ -106,10 +143,18 @@ def load_sqlite(records: list[dict]) -> int:
     return count
 
 
-def load(records: list[dict]) -> int:
-    """Load into both stores. Returns the row count."""
-    written = load_duckdb(records)
-    load_sqlite(records)
+def load(snapshots: list[tuple[str, list[dict]]]) -> int:
+    """Load into both stores. Returns the warehouse row count.
+
+    The SQLite mirror takes only the newest snapshot: it exists so the dashboard
+    export stays dependency-free, and the dashboard shows the present, not the
+    history.
+    """
+    written = load_duckdb(snapshots)
+    if snapshots:
+        newest_at = max(snapshot_at for snapshot_at, _ in snapshots)
+        newest = next(r for a, r in snapshots if a == newest_at)
+        load_sqlite(newest)
     return written
 
 
@@ -125,4 +170,4 @@ if __name__ == "__main__":
              "description": "Python, SQL, Airflow"},
         ]
     }
-    load(transform(demo))
+    load([("20260101-000000", transform(demo))])

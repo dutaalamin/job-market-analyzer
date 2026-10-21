@@ -144,12 +144,12 @@
       "pct_of_jobs": 4.0
     },
     {
-      "skill": "Linux",
+      "skill": "Terraform",
       "postings": 100,
       "pct_of_jobs": 3.8
     },
     {
-      "skill": "Terraform",
+      "skill": "Linux",
       "postings": 100,
       "pct_of_jobs": 3.8
     },
@@ -707,11 +707,11 @@
         "together": 28
       },
       {
-        "companion": "REST",
+        "companion": "Docker",
         "together": 27
       },
       {
-        "companion": "Docker",
+        "companion": "REST",
         "together": 27
       }
     ]

@@ -1,6 +1,11 @@
--- Staging: one clean row per posting.
+-- Staging: one clean row per posting, from the NEWEST snapshot only.
 -- Light typing/casting on top of the raw loader table so downstream models can
 -- assume a tidy shape.
+--
+-- The raw table holds one row per (posting, snapshot) once history is loaded.
+-- Keeping this view pinned to the latest snapshot preserves two things: the
+-- `unique` test on external_id, and the meaning of every existing mart (they all
+-- describe the present, not a sum over time). Trends read `stg_job_history`.
 
 with source as (
     select * from {{ source('raw', 'raw_jobs') }}
@@ -19,4 +24,6 @@ select
     url,
     skills
 from source
-where title is not null and company is not null
+where title is not null
+  and company is not null
+  and snapshot_at = (select max(snapshot_at) from source)

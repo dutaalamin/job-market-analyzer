@@ -106,6 +106,45 @@ def summarize(connection: duckdb.DuckDBPyConnection) -> dict:
     }
 
 
+HISTORY_CSV = ROOT / "data" / "skill_history.csv"
+
+
+def append_skill_history(payload: dict) -> None:
+    """Record one compact line per (snapshot, skill) for trend analysis.
+
+    Why not commit the raw snapshots: each is ~5 MB gzipped, so a month of daily
+    runs is ~150 MB in git history for data that is already aggregated here. The
+    trend only needs postings per skill per snapshot, which is 25 rows.
+    """
+    snapshot = payload["totals"].get("snapshot", "")
+    if not snapshot:
+        return
+
+    rows = payload.get("topSkills", [])
+    header = "snapshot,skill,postings,pct_of_jobs\n"
+    existing = HISTORY_CSV.read_text(encoding="utf-8") if HISTORY_CSV.exists() else ""
+
+    known = {
+        line.split(",", 2)[0]
+        for line in existing.splitlines()[1:]
+        if line.strip()
+    }
+    if snapshot in known:
+        print(f"[analyze] history already has {snapshot}, skipping")
+        return
+
+    lines = "".join(
+        f"{snapshot},{row['skill']},{row['postings']},{row['pct_of_jobs']}\n"
+        for row in rows
+    )
+    HISTORY_CSV.parent.mkdir(parents=True, exist_ok=True)
+    with HISTORY_CSV.open("a", encoding="utf-8") as handle:
+        if not existing:
+            handle.write(header)
+        handle.write(lines)
+    print(f"[analyze] appended {len(rows)} rows to {HISTORY_CSV.name} for {snapshot}")
+
+
 def analyze() -> dict:
     connection = duckdb.connect(str(WAREHOUSE), read_only=True)
     try:
@@ -117,6 +156,8 @@ def analyze() -> dict:
     (OUT_DIR / "metrics.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+
+    append_skill_history(payload)
     print(f"[analyze] {len(payload['topSkills'])} skills, "
           f"{len(payload['categories'])} categories -> metrics.json")
     return payload
