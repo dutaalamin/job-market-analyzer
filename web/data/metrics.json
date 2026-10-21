@@ -144,12 +144,12 @@
       "pct_of_jobs": 4.0
     },
     {
-      "skill": "Terraform",
+      "skill": "Linux",
       "postings": 100,
       "pct_of_jobs": 3.8
     },
     {
-      "skill": "Linux",
+      "skill": "Terraform",
       "postings": 100,
       "pct_of_jobs": 3.8
     },
@@ -199,7 +199,7 @@
       "pct_of_jobs": 1.6
     },
     {
-      "skill": "dbt",
+      "skill": "Node.js",
       "postings": 41,
       "pct_of_jobs": 1.6
     }

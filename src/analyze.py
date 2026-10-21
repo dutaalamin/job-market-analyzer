@@ -106,49 +106,83 @@ def summarize(connection: duckdb.DuckDBPyConnection) -> dict:
     }
 
 
-HISTORY_CSV = ROOT / "data" / "skill_history.csv"
+HISTORY_CSV = ROOT / "web" / "data" / "skill_history.csv"
 
 
-def append_skill_history(payload: dict) -> None:
+def append_skill_history(connection) -> None:
     """Record one compact line per (snapshot, skill) for trend analysis.
 
     Why not commit the raw snapshots: each is ~5 MB gzipped, so a month of daily
     runs is ~150 MB in git history for data that is already aggregated here. The
-    trend only needs postings per skill per snapshot, which is 25 rows.
-    """
-    snapshot = payload["totals"].get("snapshot", "")
-    if not snapshot:
-        return
+    trend needs postings per skill per snapshot: 57 rows, ~3 KB.
 
-    rows = payload.get("topSkills", [])
+    Reads EVERY snapshot in the warehouse, not just the newest. The previous
+    version looked only at payload["totals"]["snapshot"], so a --history run that
+    loaded two snapshots still recorded one, and the CSV could never grow faster
+    than one row-set per run.
+    """
     header = "snapshot,skill,postings,pct_of_jobs\n"
     existing = HISTORY_CSV.read_text(encoding="utf-8") if HISTORY_CSV.exists() else ""
-
     known = {
         line.split(",", 2)[0]
         for line in existing.splitlines()[1:]
         if line.strip()
     }
-    if snapshot in known:
-        print(f"[analyze] history already has {snapshot}, skipping")
+
+    snapshots = [
+        row[0]
+        for row in connection.execute(
+            "select distinct snapshot_at from raw_jobs order by snapshot_at"
+        ).fetchall()
+    ]
+
+    appended = 0
+    blocks: list[str] = []
+    for snapshot in snapshots:
+        if snapshot in known:
+            continue
+        rows = connection.execute(
+            """
+            select js.skill,
+                   count(distinct js.external_id) as postings,
+                   round(100.0 * count(distinct js.external_id)
+                         / (select count(*) from raw_jobs where snapshot_at = ?), 1)
+            from (
+                select snapshot_at, external_id, unnest(skills) as skill
+                from raw_jobs where snapshot_at = ?
+            ) js
+            group by js.skill
+            order by postings desc, js.skill
+            -- No LIMIT. The dictionary has 57 skills; storing only the top 25
+            -- made "absent from the previous list" indistinguishable from "had
+            -- zero postings", which turned a rank-26 skill into a fake riser.
+            """,
+            [snapshot, snapshot],
+        ).fetchall()
+        for skill, postings, pct in rows:
+            blocks.append(f"{snapshot},{skill},{postings},{pct}\n")
+        appended += 1
+        print(f"[analyze] history: +{len(rows)} rows for {snapshot}")
+
+    if not blocks:
+        print("[analyze] history already up to date")
         return
 
-    lines = "".join(
-        f"{snapshot},{row['skill']},{row['postings']},{row['pct_of_jobs']}\n"
-        for row in rows
-    )
     HISTORY_CSV.parent.mkdir(parents=True, exist_ok=True)
     with HISTORY_CSV.open("a", encoding="utf-8") as handle:
         if not existing:
             handle.write(header)
-        handle.write(lines)
-    print(f"[analyze] appended {len(rows)} rows to {HISTORY_CSV.name} for {snapshot}")
+        handle.write("".join(blocks))
+    print(f"[analyze] appended {len(blocks)} rows across {appended} snapshot(s)")
 
 
 def analyze() -> dict:
     connection = duckdb.connect(str(WAREHOUSE), read_only=True)
     try:
         payload = summarize(connection)
+        # Inside the try: this reads the warehouse too, and the previous version
+        # called it after the connection was already closed.
+        append_skill_history(connection)
     finally:
         connection.close()
 
@@ -156,8 +190,6 @@ def analyze() -> dict:
     (OUT_DIR / "metrics.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-
-    append_skill_history(payload)
     print(f"[analyze] {len(payload['topSkills'])} skills, "
           f"{len(payload['categories'])} categories -> metrics.json")
     return payload
